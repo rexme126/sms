@@ -10,6 +10,15 @@
           >{{ marks[0].klase.name }} Scoresheet</span
         >
       </h3>
+
+      <div class="search-input-wrap mr-3 mb-3">
+        <b-form-input v-model="search" placeholder="Search..." /><b-icon
+          style="color: #111"
+          class="h5 mt-3 search-icon"
+          icon="search"
+        />
+      </div>
+
       <div class="exam-timetable table-responsive">
         <b-form
           method="POST"
@@ -30,7 +39,7 @@
             </thead>
 
             <tbody>
-              <tr v-for="(mark, value) in marks" :key="mark.id">
+              <tr v-for="(mark, value) in markx" :key="mark.id">
                 <td>{{ value + 1 }}</td>
 
                 <td>
@@ -98,6 +107,7 @@ export default {
   data() {
     return {
       scores: [],
+      search: '',
       busy: false,
       form: new this.$form({}),
     }
@@ -106,11 +116,19 @@ export default {
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
     }),
+    markx() {
+      return this.marks.filter((t) => {
+        return (
+          t.student.first_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.student.last_name.toLowerCase().match(this.search.toLowerCase())
+        )
+      })
+    },
   },
   methods: {
     sendScores(mark, value, keyName) {
       const index = this.scores.findIndex((score) => score.markId === mark.id)
-      console.log(index)
+
       if (index === -1) {
         this.scores = [
           ...this.scores,
@@ -169,10 +187,32 @@ export default {
 <style lang="scss">
 .exam-scores {
   background-color: var(--color-white);
+  .exam-timetable {
+    input {
+      width: 60px;
+      text-align: center;
+    }
+  }
 
-  input {
-    width: 60px;
-    text-align: center;
+  .search-input-wrap {
+    width: 270px;
+    position: relative;
+    display: flex;
+
+    & .search-icon {
+      position: absolute;
+      right: 11px;
+      top: -8px;
+    }
+
+    .form-control {
+      border-radius: 30px;
+      font-size: 0.85rem;
+      padding: 18px 30px;
+      height: 35px;
+      background-color: rgba(#d9ecff, 0.5);
+      // border-color: transparent;
+    }
   }
 }
 </style>

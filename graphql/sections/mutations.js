@@ -28,3 +28,12 @@ export const UPDATE_SECTION_MUTATION = gql`
     }
   }
 `
+
+export const DELETE_SECTION_MUTATION = gql`
+  mutation DeleteSectionMutation($id: ID!) {
+    deleteSection(id: $id) {
+      id
+      name
+    }
+  }
+`

@@ -13,15 +13,15 @@
             </template>
             <template #cell(actions)="row" class="d-flex">
               <div class="d-flex">
-                <b-button size="smd" variant="primary" class="mr-1">
+                <b-button size="sm" variant="primary" class="mr-1">
                   Unpublished
                 </b-button>
-                <b-button size="smd" variant="info" class="mr-1">
+                <b-button size="sm" variant="info" class="mr-1">
                   <b-icon icon="pencil-square"></b-icon>
                 </b-button>
 
                 <b-button
-                  size="smd"
+                  size="sm"
                   variant="danger"
                   @click="row.toggleDetails"
                 >

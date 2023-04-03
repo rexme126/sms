@@ -1,6 +1,5 @@
 import gql from 'graphql-tag'
-import { SINGLE_STUDENT_FIELD_FRAGMENT } from './fragments'
-// import { TEACHERS_FIELDS_FRAGMENT } from './fragments'
+import { SINGLE_STUDENT_FIELD_FRAGMENT, STUDENT_FIELDS_FRAGMENT } from './fragments'
 
 export const CREATE_STUDENT_MUTATION = gql`
   mutation CreateStudentMutation(
@@ -31,10 +30,10 @@ export const UPDATE_STUDENT_MUTATION = gql`
       studentUser: $studentUser
       student: $student
     ) {
-      ...SingleStudentField
+      ...StudentFields
     }
   }
-  ${SINGLE_STUDENT_FIELD_FRAGMENT}
+  ${STUDENT_FIELDS_FRAGMENT}
 `
 export const DELETE_STUDENT_MUTATION = gql`
   mutation DeleteStudentMutation($id: Int!, $workspaceId: Int) {

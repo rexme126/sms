@@ -18,7 +18,14 @@
                 />
               </div>
 
-              <h2 class="text-center" style="color: #1c0988; font-weight: bold">
+              <h2
+                class="text-center"
+                style="
+                  color: #1c0988;
+                  text-transform: uppercase;
+                  font-weight: bold;
+                "
+              >
                 {{ mainWorkspace.name }}
               </h2>
               <h6
@@ -30,10 +37,8 @@
                   margin-bottom: 5rem;
                 "
               >
-                {{ studentPaymentRecord.term.name }} Payment Receipt ({{
-                  studentPaymentRecord.session.name
-                }}
-                Session)
+                {{ studentPaymentRecord.session.name }}
+                Session
               </h6>
             </div>
 
@@ -46,12 +51,12 @@
 
             <div class="text-center mt-3">
               <div v-if="studentPaymentRecord.student.photo == null"></div>
-              <img
+              <b-img
                 v-else
                 :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${studentPaymentRecord.student.photo}`"
                 alt="student"
                 width="100"
-              />
+              ></b-img>
             </div>
 
             <div class="d-flex justify-content-between mt-5">
@@ -106,6 +111,32 @@
                 <h6>{{ studentPaymentRecord.created_at | formatDate }}</h6>
               </div>
             </div>
+
+            <h5
+              class="d-flex justify-content-align mt-4 p-2"
+              style="background-color: #007bff; color: #fff"
+            >
+              SCHOOL BANK DETIALS
+            </h5>
+            <div class="d-flex justify-content-between mt-4">
+              <div>
+                <h6>Account Name</h6>
+                <h6>Account Number</h6>
+                <h6>Bank</h6>
+              </div>
+
+              <div>
+                <h6>{{ mainWorkspace.account_name }}</h6>
+                <h6 style="letter-spacing: 2px">
+                  {{ mainWorkspace.account_no }}
+                </h6>
+                <h6>{{ mainWorkspace.bank }}</h6>
+              </div>
+            </div>
+            <h3 class="text-center mt-2" style="color: green">
+              After payment please take your proof of payment to the school for
+              confrmation
+            </h3>
           </div>
         </div>
       </div>

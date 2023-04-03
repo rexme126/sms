@@ -4,281 +4,145 @@
       <Preload />
     </div>
     <div v-else>
-      <div>
-        <b-card no-body>
-          <b-tabs card>
-            <b-tab active>
-              <template #title>
-                <b-icon icon="plus" /><strong>Create Classes</strong>
-              </template>
-              <div class="p-4">
-                <div class="d-flex justify-content-between">
-                  <h4 class="mb-3">All Classes</h4>
-                  <b-button
-                    class="shadow mb-4"
-                    pill
-                    variant="warning"
-                    size="md"
-                    @click="refreshClass"
-                  >
-                    <b-spinner
-                      v-if="isBusy"
-                      small
-                      variant="light"
-                      class="mr-1 mb-1"
+      <b-card>
+        <div class="p-4">
+          <h4 class="text-center mb-4">All Classes</h4>
+
+          <b-table :items="klases" :fields="fields">
+            <template #cell(#)="data">
+              {{ data.index + 1 }}
+            </template>
+
+            <template #cell(name)="data">
+              <div v-if="klaseEditingId == data.item.id">
+                <b-row no-gutters>
+                  <b-col md="4">
+                    <input
+                      v-model="form.names"
+                      type="text"
+                      required
+                      size="lg"
+                      @blur="updatingKlase(data.value)"
+                      @keydown.enter="editFiled(data.item.id)"
                     />
-                    Refresh Class</b-button
+                  </b-col>
+                </b-row>
+              </div>
+
+              <div v-else @click="setToEditing(data.item.id)">
+                {{ data.value }}
+              </div>
+            </template>
+
+            <template #cell(actions)="data">
+              <b-button
+                variant="primary"
+                size="sm"
+                class="px-3"
+                @click="setToEditing(data.item.id)"
+              >
+                <b-icon icon="pencil" class="mr-1"> </b-icon>
+                Edit
+              </b-button>
+
+              <b-button
+                variant="danger"
+                size="sm"
+                class="px-3"
+                @click="handleDeleteCLass(data.item)"
+              >
+                <b-icon icon="trash" class="mr-1"> </b-icon>
+                Delete
+              </b-button>
+            </template>
+          </b-table>
+        </div>
+
+        <!-- Info modal -->
+        <!-- delete modal -->
+        <b-modal id="DeleteModal" centered hide-header hide-footer>
+          <div class="p-5 text-center">
+            <Spinner v-if="isDeleting" size="4" />
+            <template v-else>
+              <h5>Confirm delete class?</h5>
+
+              <p>This action cannot be undone.</p>
+
+              <div>
+                <b-button
+                  variant="light"
+                  class="px-4 mr-2 border"
+                  @click="handleCancelDelete"
+                >
+                  Cancel
+                </b-button>
+
+                <b-button variant="danger" class="px-4" @click="setToDelete">
+                  Delete
+                </b-button>
+              </div>
+            </template>
+          </div>
+        </b-modal>
+        <!-- end -->
+        <!-- Add Classes -->
+        <div class="margin-down">
+          <!-- description -->
+          <b-form
+            method="POST"
+            @submit.prevent="onSubmitCreate"
+            @keydown="form.onKeydown($event)"
+          >
+            <!-- description -->
+
+            <b-row no-gutters class="px-4 mb-5">
+              <b-col md="2">
+                <label
+                  for="input-small"
+                  class="label-padding"
+                  style="font-size: 18px"
+                  >Name:</label
+                >
+              </b-col>
+
+              <b-col md="3">
+                <b-form-group>
+                  <b-form-input
+                    id="name"
+                    v-model="form.name"
+                    name="name"
+                    placeholder="Enter class"
+                    trim
+                    type="text"
+                    required
+                    size="lg"
                   >
-                </div>
+                  </b-form-input>
+                  <b-form-invalid-feedback :state="!form.errors.has('name')">
+                    {{ form.errors.get('name') }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
 
-                <b-table :items="klases" :fields="fields">
-                  <template #cell(#)="data">
-                    {{ data.index + 1 }}
-                  </template>
-
-                  <template #cell(name)="data">
-                    <div v-if="klaseEditingId == data.item.id">
-                      <b-row no-gutters>
-                        <b-col md="4">
-                          <input
-                            v-model="form.names"
-                            type="text"
-                            required
-                            size="lg"
-                            @blur="updatingKlase(data.value)"
-                            @keydown.enter="editFiled(data.item.id)"
-                          />
-                        </b-col>
-                      </b-row>
-                    </div>
-
-                    <div v-else @click="setToEditing(data.item.id)">
-                      {{ data.value }}
-                    </div>
-                  </template>
-
-                  <template #cell(teachers)="data">
-                    <b-badge
-                      :id="`teachers-${data.index}`"
-                      variant="info"
-                      class="px-2"
-                    >
-                      {{ data.value.length }} Teacheers
-                    </b-badge>
-                    <b-popover
-                      v-if="data.value.length > 0"
-                      :target="`teachers-${data.index}`"
-                      triggers="hover click"
-                    >
-                      <b-nav vertical>
-                        <b-nav-item
-                          v-for="teacher in data.value"
-                          :key="teacher.id"
-                        >
-                          <h5>
-                            <nuxt-link :to="`/admin/teacher/${teacher.slug}`">
-                              {{ teacher.first_name }}
-                              {{ teacher.last_name }}</nuxt-link
-                            >
-                          </h5>
-                        </b-nav-item>
-                      </b-nav>
-                    </b-popover>
-                  </template>
-                  <template #cell(actions)="data">
-                    <b-button
-                      variant="primary"
-                      size="sm"
-                      class="px-3"
-                      @click="setToEditing(data.item.id)"
-                    >
-                      <b-icon icon="pencil" class="mr-1"> </b-icon>
-                      Edit
-                    </b-button>
-
-                    <b-button
-                      v-if="data.item.id == loadingId"
-                      variant="danger"
-                      size="sm"
-                      class="px-3"
-                    >
-                      <b-spinner
-                        class="mr-1 mb-1"
-                        small
-                        variant="light"
-                        v-if="loading"
-                      />
-                      <b-icon icon="circle" class="mr-1"> </b-icon>
-                      Revoke teacher
-                    </b-button>
-
-                    <b-button
-                      v-else
-                      variant="danger"
-                      size="sm"
-                      class="px-3"
-                      @click="deleteClass(data.item.id)"
-                    >
-                      <b-icon icon="circle" class="mr-1"> </b-icon>
-                      Revoke teacher
-                    </b-button>
-                  </template>
-                </b-table>
-              </div>
-
-              <!-- Info modal -->
-              <!-- Add Classes -->
-              <div class="margin-down">
-                <!-- description -->
-                <b-form
-                  method="POST"
-                  @submit.prevent="onSubmitCreate"
-                  @keydown="form.onKeydown($event)"
+                <b-button
+                  type="submit"
+                  variant="primary"
+                  class="mr-4"
+                  size="md"
+                  :disabled="form.busy"
                 >
-                  <!-- description -->
-
-                  <b-row no-gutters class="px-4 mb-5">
-                    <b-col md="2">
-                      <label
-                        for="input-small"
-                        class="label-padding"
-                        style="font-size: 18px"
-                        >Name:</label
-                      >
-                    </b-col>
-
-                    <b-col md="3">
-                      <b-form-group>
-                        <b-form-input
-                          id="name"
-                          v-model="form.name"
-                          name="name"
-                          placeholder="Enter class"
-                          trim
-                          type="text"
-                          required
-                          size="lg"
-                        >
-                        </b-form-input>
-                        <b-form-invalid-feedback
-                          :state="!form.errors.has('name')"
-                        >
-                          {{ form.errors.get('name') }}
-                        </b-form-invalid-feedback>
-                      </b-form-group>
-
-                      <b-button
-                        type="submit"
-                        variant="primary"
-                        class="mr-4"
-                        size="md"
-                        :disabled="form.busy"
-                      >
-                        <b-spinner
-                          v-if="form.busy"
-                          variant="light"
-                          class="mr-1 mb-1"
-                          small
-                        />Add Class</b-button
-                      >
-                    </b-col>
-                  </b-row>
-                </b-form>
-              </div>
-              <!-- end -->
-            </b-tab>
-
-            <b-tab>
-              <template #title>
-                <strong>Assign Teacher To Class</strong>
-              </template>
-
-              <div class="margin-down p-4">
-                <b-form
-                  method="POST"
-                  @submit.prevent="onSubmitAssign"
-                  @keydown="form.onKeydown($event)"
+                  <b-spinner
+                    v-if="form.busy"
+                    variant="light"
+                    class="mr-1 mb-1"
+                    small
+                  />Add Class</b-button
                 >
-                  <b-row class="mb-4">
-                    <b-col md="2">
-                      <label for="input-small" class="label-padding"
-                        >Class:</label
-                      >
-                    </b-col>
-
-                    <b-col md="4">
-                      <b-form-group label="">
-                        <b-form-select
-                          id="klases"
-                          v-model="form.klase"
-                          value-field="id"
-                          text-field="name"
-                          :options="klases"
-                          class="mb-3"
-                          size="md"
-                          required
-                        >
-                          <template #first>
-                            <b-form-select-option :value="null" disabled
-                              >-- select Class--</b-form-select-option
-                            >
-                          </template>
-                        </b-form-select>
-                      </b-form-group>
-                    </b-col>
-                  </b-row>
-
-                  <b-row class="py-4">
-                    <b-col md="2">
-                      <label for="input-small" class="label-padding"
-                        >Assign Teacher:</label
-                      >
-                    </b-col>
-
-                    <b-col md="4">
-                      <b-form-group label="">
-                        <b-form-select
-                          v-model="teacherx"
-                          value-field="id"
-                          text-field="first_name"
-                          :options="teachers"
-                          multiple
-                          required
-                          style="height: 15rem"
-                          class="mb-3"
-                          size="smd"
-                        >
-                        </b-form-select>
-                      </b-form-group>
-                    </b-col>
-                  </b-row>
-
-                  <b-row>
-                    <b-col
-                      md="10"
-                      class="d-flex justify-content-center p-4 mt-2 mb-4"
-                      ><b-button
-                        type="submit"
-                        variant="primary"
-                        class="mr-4"
-                        :disabled="busy"
-                        size="md"
-                      >
-                        <b-spinner
-                          v-if="busy"
-                          small
-                          variant="light"
-                          class="mr-1 mb-1"
-                        />Submit</b-button
-                      >
-                    </b-col>
-                  </b-row>
-                </b-form>
-              </div>
-            </b-tab>
-          </b-tabs>
-        </b-card>
-      </div>
+              </b-col>
+            </b-row>
+          </b-form>
+        </div>
+        <!-- end -->
+      </b-card>
     </div>
   </div>
 </template>
@@ -289,12 +153,10 @@ import { useWorkspaceStore } from '@/stores/wokspace'
 import Swal from 'sweetalert2'
 import { KLASE_QUERIES, KLASE_QUERY } from '~/graphql/klases/queries'
 import {
-  ASSIGN_KLASE_TO_TEACHER_MUTATION,
   CREATE_KLASE_MUTATION,
   DELETE_KLASE_MUTATION,
   UPDATE_KLASE_MUTATION,
 } from '@/graphql/klases/mutations'
-import { TEACHERS_QUERIES } from '~/graphql/teachers/queries'
 import Preload from '~/components/Preload.vue'
 
 export default {
@@ -304,12 +166,12 @@ export default {
     return {
       id: 0,
       isBusy: false,
-      loadingId: null,
+      isDeleting: false,
+      invokedForDelete: null,
       loading: false,
       klaseEditingId: '',
       klase: {},
       klases: [],
-      teachers: [],
       teacherx: [],
       busy: false,
       form: new this.$form({
@@ -329,10 +191,7 @@ export default {
           key: 'name',
           sortable: false,
         },
-        {
-          key: 'teachers',
-          sortable: false,
-        },
+
         {
           key: 'actions',
           sortable: false,
@@ -349,37 +208,16 @@ export default {
         }
       },
     },
-    teachers: {
-      query: TEACHERS_QUERIES,
-      variables() {
-        return {
-          workspaceId: parseInt(this.mainWorkspace.id),
-        }
-      },
-    },
   },
   computed: {
     nowLoading() {
-      return (
-        this.$apollo.queries.klases.loading &&
-        this.$apollo.queries.teachers.loading
-      )
+      return this.$apollo.queries.klases.loading
     },
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
     }),
   },
   methods: {
-    refreshClass() {
-      this.isBusy = true
-      setTimeout(() => {
-        if (this.isBusy == true) {
-          this.$apollo.queries.klases.refresh()
-
-          this.isBusy = false
-        }
-      }, 1500)
-    },
     // inline editing
     setToEditing(item) {
       this.klaseEditingId = item
@@ -502,73 +340,57 @@ export default {
         }
       }
     },
-    // assign class to teacher
-    async onSubmitAssign() {
-      if (this.form.klase === null && this.teacherx === []) {
-        return false
-      } else {
-        this.teacherx.forEach((element) => {
-          const intValue = parseInt(element)
-          this.form.teacher.push(intValue)
-        })
-      }
-      this.busy = true
-      // submit exam
-      try {
-        await this.$apollo
-          .mutate({
-            mutation: ASSIGN_KLASE_TO_TEACHER_MUTATION,
-            variables: {
-              klase: parseInt(this.form.klase),
-              teacher: this.form.teacher,
-            },
-          })
-          .then(() => {
-            this.busy = false
-            this.form.klase = ''
-            this.form.teacher = []
-            Swal.fire({
-              title: 'Done...',
-              icon: 'success',
-              timer: 1500,
-              text: 'Teacher(s) assigned successfully',
-              position: 'center',
-              color: '#fff',
-              background: '#4bb543',
-              toast: false,
-              backdrop: false,
-              showConfirmButton: false,
-            })
-          })
-        this.form.busy = false
-      } catch ({ graphQLErrors: errors }) {
-        this.form.busy = false
-        if (errors && errors.length > 0) {
-          const validationErrors = errors.filter(
-            (err) => err.extensions.category === 'validation'
-          )
-          validationErrors.forEach((err) => {
-            this.form.errors.set(err.extensions.validation)
-          })
-        }
-      }
+    // -------- delete mutation -------------- //
+    handleCancelDelete() {
+      this.invokedForDelete = null
+
+      this.$bvModal.hide('DeleteModal')
     },
+
+    handleDeleteCLass(item) {
+      this.invokedForDelete = item
+
+      this.$bvModal.show('DeleteModal')
+    },
+
     // ------delete ----------/
-    deleteClass(item) {
-      this.loading = true
-      const deleteId = item
-      this.loadingId = deleteId
+    setToDelete() {
+      this.isDeleting = true
+      const deleteId = this.invokedForDelete.id
       this.$apollo
         .mutate({
           mutation: DELETE_KLASE_MUTATION,
           variables: {
             id: parseInt(deleteId),
           },
+          update: (store, { data: { deleteKlase } }) => {
+            const data = store.readQuery({
+              query: KLASE_QUERIES,
+              variables: {
+                workspaceId: parseInt(this.mainWorkspace.id),
+              },
+            })
+
+            const index = data.klases.findIndex((m) => m.id === deleteId)
+            if (index !== -1) {
+              // Mutate cache result
+              data.klases.splice(index, 1)
+
+              store.writeQuery({
+                query: KLASE_QUERIES,
+                variables: {
+                  workspaceId: parseInt(this.mainWorkspace.id),
+                },
+                data,
+              })
+            }
+          },
         })
+
         .then(() => {
           Swal.fire({
             timer: 1000,
-            text: 'teacher revoked successfully',
+            text: 'class deleted successfully',
             position: 'top-right',
             color: '#fff',
             background: '#4bb543',
@@ -576,10 +398,15 @@ export default {
             backdrop: false,
             showConfirmButton: false,
           })
-          this.loading = false
+          this.isDeleting = false
         })
         .catch(() => {
           // this.klase_id =
+        })
+        .finally(() => {
+          this.$bvModal.hide('DeleteModal')
+
+          this.isDeleting = false
         })
     },
   },

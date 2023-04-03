@@ -470,13 +470,8 @@ export default {
                   workspaceId: parseInt(this.mainWorkspace.id),
                 },
               })
-              // console.log(this.form.class);
-
               data.timetables.push(createTimetable)
-              // console.log(dataCopy)
-
-              // Write our data back to the cache.
-              // Write back to the cache
+              
               store.writeQuery({
                 query: TIMETABLE_QUERIES,
                 variables: {

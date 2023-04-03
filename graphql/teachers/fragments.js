@@ -32,13 +32,9 @@ export const TEACHERS_FIELDS_FRAGMENT = gql`
     birthday
     qualification
     employment
-    klases {
-      ...KlaseFields
-    }
     user {
       ...UxerFields
     }
   }
-  ${KLASE_FIELDS_FRAGMENT}
   ${UXER_FIELDS_FRAGMENT}
 `

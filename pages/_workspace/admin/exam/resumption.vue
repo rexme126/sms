@@ -16,7 +16,7 @@
 
             <b-col md="4">
               <b-form-select
-                id="terms"
+                id="sessions"
                 v-model="form.term"
                 value-field="id"
                 text-field="name"
@@ -84,7 +84,7 @@
             </b-col>
           </b-row>
 
-          <b-row class="mt-3"> 
+          <b-row class="mt-3">
             <b-col md="2">
               <label for="input-small" class="label-padding">Session:</label>
             </b-col>
@@ -137,8 +137,8 @@ export default {
   data() {
     return {
       form: {
-        session: null,
         term: null,
+        session: null,
         start: null,
         end: null,
         busy: false,
@@ -202,38 +202,16 @@ export default {
             .mutate({
               mutation: UPDATE_RESUMPTION_MUTATION,
               variables: {
+                term_id: parseInt(this.form.term),
                 term_start: this.form.start,
                 term_end: this.form.end,
-                term_id: parseInt(this.form.term),
                 session_id: parseInt(this.form.session),
                 workspaceId: parseInt(this.mainWorkspace.id),
               },
-              update: (store, { data: { updateResumption } }) => {
-                // Read the data from our cache for this query.
-                const data = store.readQuery({
-                  query: RESUMPTION_QUERIES,
-                  variables: {
-                    term_id: parseInt(this.form.term),
-                    session_id: parseInt(this.form.session),
-                    workspaceId: parseInt(this.mainWorkspace.id),
-                  },
-                })
-
-                data.resumptions = updateResumption
-
-                store.writeQuery({
-                  query: RESUMPTION_QUERIES,
-                  variables: {
-                    term_id: parseInt(this.form.term),
-                    session_id: parseInt(this.form.session),
-                    workspaceId: parseInt(this.mainWorkspace.id),
-                  },
-                  data,
-                })
-              },
             })
-            .then(() => {
-              Swal.fire({
+            .then(({data}) => {
+              if(data.updateResumption.length > 0){
+                Swal.fire({
                 timer: 1500,
                 text: 'work saved successfully',
                 position: 'top-right',
@@ -243,11 +221,23 @@ export default {
                 backdrop: false,
                 showConfirmButton: false,
               })
-              this.form.start = null
-              this.form.term = null
-              this.form.session = null
-              this.form.end = null
+
               this.form.busy = false
+              }else{
+                Swal.fire({
+                timer: 1500,
+                text: 'Please enter current session',
+                position: 'top-right',
+                color: '#fff',
+                background: '#d9534f',
+                toast: false,
+                backdrop: false,
+                showConfirmButton: false,
+              })
+
+              this.form.busy = false
+              }
+              
             })
         } catch ({ graphQLErrors: errors }) {
           this.form.busy = false

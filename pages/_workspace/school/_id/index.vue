@@ -2,7 +2,7 @@
   <div class="p-3">
     <template v-if="nowLoading"><Preload /></template>
     <template v-else>
-      <b-card class="p-4">
+      <b-card class="p-4" v-if="school">
         <div class="text-center mb-4">
           <b-img
             v-if="school"
@@ -17,7 +17,7 @@
           <span v-if="school" style="color: green">{{ school.name }}</span>
         </h5>
 
-        <h5>
+        <h5 v-if="school">
           Full Name:
           <span v-if="school" style="color: green"
             >{{ school.user.last_name }} {{ school.user.first_name }}</span
@@ -36,12 +36,12 @@
           All Teachers: <span style="color: red">{{ teachers }}</span>
         </h5>
 
-        <h5>
+        <h5 v-if="school">
           All accountants:
           <span style="color: red">{{ accountantLength }}</span>
         </h5>
-        <h5>
-          All accountants:
+        <h5 v-if="school">
+          School Admin:
           <span style="color: red">{{ schoolAdmin }}</span>
         </h5>
 

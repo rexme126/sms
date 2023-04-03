@@ -75,12 +75,12 @@
                         :key="subject.id"
                         rowspan="2"
                       >
-                        {{ subject.subject }}
+                        {{ subject.subject_code }}
                       </th>
 
-                      <th v-if="student[1] == 3">1ST TERM TOTAL</th>
-                      <th v-if="student[1] == 3">2ND TERM TOTAL</th>
-                      <th v-if="student[1] == 3">3RD TERM TOTAL</th>
+                      <th v-if="student[1] == 3">1st Term Total</th>
+                      <th v-if="student[1] == 3">2nd Term Total</th>
+                      <th v-if="student[1] == 3">3rd Term Total</th>
                       <th v-if="student[1] == 3" style="color: darkred">
                         CUM Total
                       </th>
@@ -106,19 +106,18 @@
                   </thead>
                   <tbody>
                     <tr v-for="(stud, index) in studentx" :key="stud.id">
-                   
                       <td>{{ index + 1 }}</td>
-                      
+
                       <td>
                         {{
                           filterNames(stud.id) != null
                             ? filterNames(stud.id).student.last_name
-                            : ''
+                            : 'Nil'
                         }}
                         {{
                           filterNames(stud.id) != null
                             ? filterNames(stud.id).student.first_name
-                            : ''
+                            : 'Nil'
                         }}
                       </td>
 
@@ -126,21 +125,51 @@
                         {{
                           filterMarks(subject, stud.id) != null
                             ? filterMarks(subject, stud.id).exam_total
-                            : ''
+                            : 'Nil'
                         }}
                       </td>
-                      <td>
+                      <td v-if="student[1] == 1 || student[1] == 2">
                         {{
                           classRecords(stud.id) != null
                             ? classRecords(stud.id).total
-                            : ''
+                            : 'Nil'
                         }}
                       </td>
+
+                      <td v-if="student[1] == 3">
+                        {{
+                          firstTermRecord(stud.id) != null
+                            ? firstTermRecord(stud.id).total
+                            : 'Nil'
+                        }}
+                      </td>
+                      <td v-if="student[1] == 3">
+                        {{
+                          secondTermRecord(stud.id) != null
+                            ? secondTermRecord(stud.id).total
+                            : 'Nil'
+                        }}
+                      </td>
+                      <td v-if="student[1] == 3">
+                        {{
+                          thirdTermTotal(stud.id) != null
+                            ? thirdTermTotal(stud.id).total
+                            : 'Nil'
+                        }}
+                      </td>
+                      <td v-if="student[1] == 3">
+                        {{
+                          classRecords(stud.id) != null
+                            ? classRecords(stud.id).cum_total
+                            : 'Nil'
+                        }}
+                      </td>
+
                       <td>
                         {{
                           classRecords(stud.id) != null
                             ? classRecords(stud.id).avg
-                            : ''
+                            : 'Nil'
                         }}
                       </td>
 
@@ -149,7 +178,7 @@
                           postion(
                             classRecords(stud.id) != null
                               ? classRecords(stud.id).position
-                              : ''
+                              : 'Nil'
                           )
                         "
                       ></td>
@@ -187,19 +216,8 @@ export default {
       type: Array,
       required: false,
     },
-    firstTerm: {
-      type: Array,
-      required: false,
-    },
-    secoundTerm: {
-      type: Array,
-      required: false,
-    },
+
     marks: {
-      type: Array,
-      required: false,
-    },
-    thirdTerm: {
       type: Array,
       required: false,
     },
@@ -212,6 +230,14 @@ export default {
       required: false,
     },
     studentx: {
+      type: Array,
+      required: false,
+    },
+    firstTermRecords: {
+      type: Array,
+      required: false,
+    },
+    secondTermRecords: {
       type: Array,
       required: false,
     },
@@ -236,9 +262,7 @@ export default {
     filterMarks(sub, stud) {
       const l = this.marks
         .filter((t) => t.subject.id == sub.id)
-        .filter(
-          (value) => value.student.id == stud
-        )
+        .filter((value) => value.student.id == stud)
 
       return l[0]
     },
@@ -251,6 +275,27 @@ export default {
       const r = this.records.filter((value) => value.student.id == stud)
 
       return r[0]
+    },
+    firstTermRecord(stud) {
+      const first = this.firstTermRecords.filter(
+        (value) => value.student.id == stud
+      )
+
+      return first[0]
+    },
+    secondTermRecord(stud) {
+      const second = this.secondTermRecords.filter(
+        (value) => value.student.id == stud
+      )
+
+      return second[0]
+    },
+    thirdTermTotal(stud) {
+      const third = this.records.filter(
+        (value) => value.student.id == stud && value.term.id == 3
+      )
+
+      return third[0]
     },
     postion(i) {
       const j = i % 10

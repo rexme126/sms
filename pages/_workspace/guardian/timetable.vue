@@ -22,8 +22,6 @@
                     >-- select class --</b-form-select-option
                   >
                 </template>
-
-                <!-- These options will appear after the ones from 'options' prop -->
               </b-form-select>
             </b-form-group>
           </b-col>
@@ -42,6 +40,11 @@
                 @change="timetableDropdown"
               >
                 <!-- These options will appear after the ones from 'options' prop -->
+                <template #first>
+                  <b-form-select-option :value="null" disabled
+                    >-- select section --</b-form-select-option
+                  >
+                </template>
               </b-form-select>
             </b-form-group>
           </b-col>

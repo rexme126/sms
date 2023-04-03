@@ -23,13 +23,14 @@
           </div>
         </div>
 
-        <!-- <div class="search-input-wrap mr-3 ml-auto">
-        <b-form-input
-          v-model="search"
-          placeholder="Search for due payment"
-          debounce="1000"
-        />
-      </div> -->
+        <div class="search-input-wrap mr-3 ml-auto">
+          <b-form-input v-model="search" placeholder="Search..." />
+          <b-icon
+            style="color: #111"
+            class="h5 mt-3 search-icon"
+            icon="search"
+          />
+        </div>
       </div>
 
       <template v-if="$apollo.queries.allDuePaymentRecords.loading">
@@ -80,7 +81,7 @@
 
                 <tbody>
                   <b-tr
-                    v-for="(payment, index) in allDuePaymentRecords.data"
+                    v-for="(payment, index) in searchFilter"
                     :key="payment.id"
                   >
                     <b-td>{{ index + 1 }}</b-td>
@@ -150,11 +151,9 @@
       </template>
 
       <template v-else-if="allDuePaymentRecords.data.length == 0">
-        <b-card class="shadow-sm border-0 text-center no-lead mt-2">
+        <b-card class="shadow-sm border-0 text-center no-lead mt-2 p-4">
           <div>
-            <h6 class="mt-4 light-text">
-              You have no leads yet. Click on "Create New" above to get started.
-            </h6>
+            <h4 class="mt-4 light-text">No record found</h4>
           </div>
         </b-card>
       </template>
@@ -169,13 +168,13 @@ import { ALL_DUE_PAYMENT_QUERY } from '~/graphql/payments/queries'
 import Preload from '~/components/Preload.vue'
 
 export default {
-  components: {Preload},
+  components: { Preload },
   middleware: 'auth',
 
   data() {
     return {
-      show: 4,
-      search: null,
+      show: 10,
+      search: '',
       selectedOptions: null,
 
       allDuePaymentRecords: {
@@ -187,8 +186,8 @@ export default {
 
       shows: [
         { value: null, text: 10 },
-        { value: 20, text: 20 },
-        { value: 50, text: 50 },
+        { value: 25, text: 25 },
+        { value: 100, text: 100 },
         { value: 1000, text: 'more' },
       ],
     }
@@ -215,6 +214,18 @@ export default {
     lastPage() {
       return this.allDuePaymentRecords.paginatorInfo.lastPage
     },
+    searchFilter() {
+      return this.allDuePaymentRecords.data.filter((t) => {
+        return (
+          t.klase.name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.student.first_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.student.last_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.session.name.match(this.search) ||
+          t.term.name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.ref_no.toLowerCase().match(this.search.toLowerCase())
+        )
+      })
+    },
   },
 
   apollo: {
@@ -223,7 +234,7 @@ export default {
       variables() {
         return {
           workspaceId: parseInt(this.mainWorkspace.id),
-          search: this.search,
+          // search: this.search,
           first: parseInt(this.show || 10),
           page: parseInt(this.currentPage),
         }
@@ -253,16 +264,23 @@ export default {
     align-items: center;
 
     .search-input-wrap {
-      width: 300px;
+      width: 270px;
       position: relative;
+      display: flex;
+
+      & .search-icon {
+        position: absolute;
+        right: 11px;
+        top: -8px;
+      }
 
       .form-control {
         border-radius: 30px;
         font-size: 0.85rem;
-        padding: 10px 30px;
+        padding: 20px 30px;
         height: 35px;
         background-color: rgba(#d9ecff, 0.5);
-        border-color: transparent;
+        // border-color: transparent;
       }
     }
     .show-input-wrap {

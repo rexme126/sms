@@ -4,7 +4,7 @@
       <b-tabs card>
         <b-tab active>
           <template #title>
-            <strong>Incomplate Payment</strong>
+            <strong>Incomplete Payment</strong>
           </template>
 
           <h5 v-if="DuePaymentrecords == null" class="text-center mt-4">
@@ -98,24 +98,27 @@
                           class="card-student display"
                           style="background-color: #fff"
                         >
-                          <div
-                            style="
-                              padding: 50px;
-                              margin: auto;
-                              min-height: 100vh;
-                            "
-                          >
+                          <div style="padding: 50px; margin: auto">
                             <div class="mt-3">
                               <div class="text-center">
                                 <div v-if="mainWorkspace.logo == null"></div>
-                                <img
-                                  v-else
-                                  :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/logo/${mainWorkspace.logo}`"
-                                  alt="logo"
-                                  width="50"
-                                />
+                                <div v-else-if="encodedImages">
+                                  <img
+                                    :src="`data:image/png;base64,${encodedImages.logoBase64}`"
+                                    alt="logo"
+                                    width="50"
+                                  />
+                                </div>
                               </div>
-                              <h3 align="center">{{ mainWorkspace.name }}</h3>
+                              <h3
+                                align="center"
+                                style="
+                                  text-transform: uppercase;
+                                  font-weight: bold;
+                                "
+                              >
+                                {{ mainWorkspace.name }}
+                              </h3>
                               <h5 align="center">
                                 {{ DuePaymentrecord.term.name }} Payment Receipt
                               </h5>
@@ -125,8 +128,8 @@
                             </div>
 
                             <div
-                              class="d-flex justify-content-align mt-2 p-3"
-                              style="background-color: #007bff; color: #fff"
+                              class="d-flex justify-content-align mt-2 mb-2 p-2"
+                              style="background-color: #007bff; font-weight:bold; color: #fff"
                             >
                               STUDENT INFORMATION
                             </div>
@@ -135,12 +138,13 @@
                               <div
                                 v-if="DuePaymentrecord.student.photo == null"
                               ></div>
-                              <img
-                                v-else
-                                :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${DuePaymentrecord.student.photo}`"
-                                alt="student"
-                                width="50"
-                              />
+                              <div v-else-if="encodedImages">
+                                <b-img
+                                  :src="`data:image/png;base64,${encodedImages.photoBase64}`"
+                                  alt="photo"
+                                  width="100"
+                                ></b-img>
+                              </div>
                             </div>
 
                             <div class="d-flex justify-content-between mt-4">
@@ -172,7 +176,7 @@
                             </div>
 
                             <h5
-                              class="d-flex justify-content-align mt-2 p-3"
+                              class="d-flex justify-content-align mt-2 p-2"
                               style="background-color: #007bff; color: #fff"
                             >
                               PAYMENT INFORMATION
@@ -220,7 +224,7 @@
 
         <b-tab>
           <template #title>
-            <strong>Paid Payment</strong>
+            <strong>Complete Payment</strong>
           </template>
           <h5 v-if="PaidPaymentrecords.length == 0" class="text-center mt-4">
             No record found
@@ -306,7 +310,6 @@
                       pdf-format="a4"
                       pdf-orientation="landscape"
                       pdf-content-width=""
-                      :html-to-pdf-options="htmlToPdfOptions"
                     >
                       <section slot="pdf-content">
                         <div
@@ -317,14 +320,23 @@
                             <div class="m-4">
                               <div class="text-center">
                                 <div v-if="mainWorkspace.logo == null"></div>
-                                <img
-                                  v-else
-                                  :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/logo/${mainWorkspace.logo}`"
-                                  alt="logo"
-                                  width="50"
-                                />
+                                <div v-else-if="encodedImages">
+                                  <img
+                                    :src="`data:image/png;base64,${encodedImages.logoBase64}`"
+                                    alt="logo"
+                                    width="100"
+                                  />
+                                </div>
                               </div>
-                              <h3 align="center">{{ mainWorkspace.name }}</h3>
+                              <h3
+                                align="center"
+                                style="
+                                  text-transform: uppercase;
+                                  font-weight: bold;
+                                "
+                              >
+                                {{ mainWorkspace.name }}
+                              </h3>
                               <h5 align="center">
                                 {{ PaidPaymentrecord.term.name }} Payment
                                 Receipt
@@ -335,7 +347,7 @@
                             </div>
 
                             <div
-                              class="d-flex justify-content-align mt-2 p-3"
+                              class="d-flex justify-content-align mt-2 mb-2 p-2"
                               style="background-color: #007bff; color: #fff"
                             >
                               STUDENT INFORMATION
@@ -345,12 +357,13 @@
                               <div
                                 v-if="PaidPaymentrecord.student.photo == null"
                               ></div>
-                              <img
-                                v-else
-                                :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${PaidPaymentrecord.student.photo}`"
-                                alt="student"
-                                width="50"
-                              />
+                              <div v-else-if="encodedImages">
+                                <b-img
+                                  :src="`data:image/png;base64,${encodedImages.photoBase64}`"
+                                  alt="photo"
+                                  width="100"
+                                ></b-img>
+                              </div>
                             </div>
 
                             <div class="d-flex justify-content-between mt-4">
@@ -382,7 +395,7 @@
                             </div>
 
                             <h5
-                              class="d-flex justify-content-align mt-2 p-3"
+                              class="d-flex justify-content-align mt-2 p-2"
                               style="background-color: #007bff; color: #fff"
                             >
                               PAYMENT INFORMATION
@@ -435,6 +448,7 @@
 <script>
 import { mapState } from 'pinia'
 import { useWorkspaceStore } from '@/stores/wokspace'
+import { ENCODED_IMAGE_QUERIES } from '~/graphql/students/queries'
 export default {
   props: {
     PaidPaymentrecords: {
@@ -444,6 +458,20 @@ export default {
     DuePaymentrecords: {
       type: Array,
       required: false,
+    },
+    studentId: String,
+    required: false,
+  },
+
+  apollo: {
+    encodedImages: {
+      query: ENCODED_IMAGE_QUERIES,
+      variables() {
+        return {
+          studentId: parseInt(this.studentId),
+          workspaceId: parseInt(this.mainWorkspace.id),
+        }
+      },
     },
   },
 
@@ -459,13 +487,6 @@ export default {
     ...mapState(useWorkspaceStore, ['currentWorkspace']),
     mainWorkspace() {
       return this.currentWorkspace
-    },
-    htmlToPdfOptions() {
-      return {
-        html2canvas: {
-          useCORS: true,
-        },
-      }
     },
   },
 }

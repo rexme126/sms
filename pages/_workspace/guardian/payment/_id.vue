@@ -6,9 +6,9 @@
     <template v-else>
       <b-button
         v-if="
-          mainWorkspace.bank != '' ||
-          mainWorkspace.account_no != '' ||
-          mainWorkspace.account_name != ''
+          mainWorkspace.bank != null ||
+          mainWorkspace.account_no != null ||
+          mainWorkspace.account_name != null
         "
         class="shadow-sm mb-3"
         variant="light"
@@ -18,7 +18,7 @@
         >Click yet to see bank details</b-button
       >
       <b-card>
-        <div style="padding: 1px; margin: auto; min-height: 100vh">
+        <div style="padding: 1px; margin: auto">
           <div class="mt-4">
             <div class="text-center mb-4">
               <div v-if="mainWorkspace.logo == null"></div>
@@ -30,7 +30,14 @@
               ></b-img>
             </div>
 
-            <h1 class="text-center" style="color: #1c0988; font-weight: bold">
+            <h1
+              class="text-center"
+              style="
+                color: #1c0988;
+                text-transform: uppercase;
+                font-weight: bold;
+              "
+            >
               {{ mainWorkspace.name }}
             </h1>
             <h6
@@ -42,10 +49,8 @@
                 margin-bottom: 5rem;
               "
             >
-              {{ studentPaymentRecord.term.name }} Payment Receipt ({{
-                studentPaymentRecord.session.name
-              }}
-              Session)
+              {{ studentPaymentRecord.session.name }}
+              Session
             </h6>
           </div>
 
@@ -119,7 +124,10 @@
           <hr />
 
           <section
-            v-if="studentPaymentRecord.balance > 0 && mainWorkspace.paystack_secret_key != null"
+            v-if="
+              studentPaymentRecord.balance > 0 &&
+              mainWorkspace.paystack_secret_key != null
+            "
             class="online-payment"
           >
             <h5 class="text-center mt-2 p-3" style="">PAY WITH CARD</h5>

@@ -2,7 +2,7 @@
   <div class="teacher p-3">
     <template v-if="$apollo.queries.teachers.loading"><Preload /></template>
     <template v-else>
-      <b-button
+      <b-button v-if="teacherCount <= 30"
         :to="{
           name: 'workspace-admin-teacher-add-teacher',
           params: { workspace: mainWorkspace.slug },
@@ -468,6 +468,9 @@ export default {
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
     }),
+    teacherCount(){
+      return this.teachers.length
+    }
   },
   mounted() {
     // Set the initial number of items

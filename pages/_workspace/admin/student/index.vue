@@ -2,7 +2,7 @@
   <div class="student p-3">
     <template v-if="$apollo.queries.students.loading"><Preload /></template>
     <template v-else>
-      <b-button
+      <b-button v-if="students != null ? studentCount < mainWorkspace.numstudent.count : mainWorkspace.numstudent"
         :to="{
           name: 'workspace-admin-student-add-student',
           params: { workspace: mainWorkspace.slug },
@@ -192,7 +192,7 @@
                       variant="success"
                       class="px-2"
                     >
-                      <div>{{ data.value.name }}</div>
+                      <div>{{ data.value.name != null ? data.value.name : 'graduate' }}</div>
                     </b-badge>
                   </template>
 
@@ -451,6 +451,9 @@ export default {
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
     }),
+    studentCount(){
+      return this.students.length
+    }
   },
   mounted() {
     // Set the initial number of items

@@ -116,13 +116,12 @@
       <div v-show="timetableDropdownClass">
         <ExamPublishResult
           v-if="records"
+          :firstTermRecords="firstTermRecords"
+          :secondTermRecords="secondTermRecords"
           :records="records"
           :marks="marks"
           :subjects="markSubjects"
           :studentx="studentx"
-          :first-term="firstTerm"
-          :secound-term="secoundTerm"
-          :third-term="thirdTerm"
           :student="[form.class, form.term, form.session, form.section]"
         />
       </div>
@@ -135,9 +134,6 @@ import { mapState } from 'pinia'
 import { useWorkspaceStore } from '@/stores/wokspace'
 import {
   EXAM_RECORD_QUERIES,
-  FIRST_TERM_QUERIES,
-  SECOUND_TERM_QUERIES,
-  THIRD_TERM_QUERIES,
 } from '~/graphql/examRecord/queries'
 import { KLASE_QUERIES } from '~/graphql/klases/queries'
 import {
@@ -157,14 +153,13 @@ export default {
   data() {
     return {
       records: null,
+      firstTermRecords: [],
+      secondTermRecords: [],
       klaseResults: [],
       marks: [],
       markSubjects: [],
       markStudents: [],
       studentx: [],
-      firstTerm: [],
-      secoundTerm: [],
-      thirdTerm: [],
       publishResult: null,
       timetableDropdownClass: false,
       form: {
@@ -259,6 +254,41 @@ export default {
           },
         })
 
+         this.$apollo.addSmartQuery('klaseResults', {
+          query: EXAM_RECORD_QUERIES,
+          variables() {
+            return {
+              klase_id: parseInt(this.form.class),
+              term_id: 1,
+              session_id: parseInt(this.form.session),
+              section_id: parseInt(this.form.section),
+              workspaceId: parseInt(this.mainWorkspace.id),
+            }
+          },
+          result({ loading, data }, key) {
+            if (!loading) {
+              this.firstTermRecords = data.klaseResults
+            }
+          },
+        })
+          this.$apollo.addSmartQuery('klaseResults', {
+          query: EXAM_RECORD_QUERIES,
+          variables() {
+            return {
+              klase_id: parseInt(this.form.class),
+              term_id: 2,
+              session_id: parseInt(this.form.session),
+              section_id: parseInt(this.form.section),
+              workspaceId: parseInt(this.mainWorkspace.id),
+            }
+          },
+          result({ loading, data }, key) {
+            if (!loading) {
+              this.secondTermRecords = data.klaseResults
+            }
+          },
+        })
+
         this.$apollo.addSmartQuery('markSubjects', {
           query: MARK_SUBJECT_QUERIES,
           variables: {
@@ -304,63 +334,6 @@ export default {
             if (!loading) {
               this.marks = data.marks
                this.isBusy = false
-              this.timetableDropdownClass = true
-            }
-          },
-        })
-
-        this.$apollo.addSmartQuery('firstTerm', {
-          query: FIRST_TERM_QUERIES,
-          variables() {
-            return {
-              klase_id: parseInt(this.form.class),
-              term_id: 1,
-              session_id: parseInt(this.form.session),
-              section_id: parseInt(this.form.section),
-              workspaceId: parseInt(this.mainWorkspace.id),
-            }
-          },
-          result({ loading, data }, key) {
-            if (!loading) {
-              this.firstTerm = data.firstTerm
-            }
-          },
-        })
-
-        this.$apollo.addSmartQuery('secoundTerm', {
-          query: SECOUND_TERM_QUERIES,
-          variables() {
-            return {
-              klase_id: parseInt(this.form.class),
-              term_id: 2,
-              session_id: parseInt(this.form.session),
-              section_id: parseInt(this.form.section),
-              workspaceId: parseInt(this.mainWorkspace.id),
-            }
-          },
-          result({ loading, data }, key) {
-            if (!loading) {
-              this.secoundTerm = data.secoundTerm
-            }
-          },
-        })
-
-        this.isBusy = true
-        this.$apollo.addSmartQuery('thirdTerm', {
-          query: THIRD_TERM_QUERIES,
-          variables() {
-            return {
-              klase_id: parseInt(this.form.class),
-              term_id: 3,
-              session_id: parseInt(this.form.session),
-              section_id: parseInt(this.form.section),
-              workspaceId: parseInt(this.mainWorkspace.id),
-            }
-          },
-          result({ loading, data }, key) {
-            if (!loading) {
-              this.thirdTerm = data.thirdTerm
-              this.isBusy = false
               this.timetableDropdownClass = true
             }
           },

@@ -50,49 +50,88 @@
         style="background-color: #fff"
       >
         <b-card no-body>
-        
-            <div class="p-3">
-              <h3 class="mb-3">All Sections</h3>
-              <b-table :items="sections" :fields="fields">
-                <template #cell(#)="data">
-                  {{ data.index + 1 }}
-                </template>
-                <template #cell(name)="data">
-                  <div v-if="sectionEditingId == data.item.id">
-                    <b-row no-gutters>
-                      <b-col md="4">
-                        <input
-                          v-model="form.names"
-                          style="width: 10rem"
-                          type="text"
-                          required
-                          size="lg"
-                          @blur="updatingSection(data.value)"
-                          @keydown.enter="editFiled(data.item.id)"
-                        />
-                      </b-col>
-                    </b-row>
-                  </div>
+          <div class="p-3">
+            <h3 class="mb-3">All Sections</h3>
+            <b-table :items="sections" :fields="fields">
+              <template #cell(#)="data">
+                {{ data.index + 1 }}
+              </template>
+              <template #cell(name)="data">
+                <div v-if="sectionEditingId == data.item.id">
+                  <b-row no-gutters>
+                    <b-col md="4">
+                      <input
+                        v-model="form.names"
+                        style="width: 10rem"
+                        type="text"
+                        required
+                        size="lg"
+                        @blur="updatingSection(data.value)"
+                        @keydown.enter="editFiled(data.item.id)"
+                      />
+                    </b-col>
+                  </b-row>
+                </div>
 
-                  <div v-else @click="setToEditing(data.item.id)">
-                    {{ data.item.name }}
-                  </div>
-                </template>
+                <div v-else @click="setToEditing(data.item.id)">
+                  {{ data.item.name }}
+                </div>
+              </template>
 
-                <template #cell(actions)="data">
+              <template #cell(actions)="data">
+                <b-button
+                  variant="primary"
+                  size="sm"
+                  class="px-3"
+                  @click="setToEditing(data.item.id)"
+                >
+                  <b-icon icon="pencil" class="mr-1"> </b-icon>
+                  Edit
+                </b-button>
+
+                <b-button
+                  variant="danger"
+                  size="sm"
+                  class="px-3"
+                  @click="handleDeleteSubject(data.item)"
+                >
+                  <b-icon icon="trash" class="mr-1"> </b-icon>
+                  Delete
+                </b-button>
+              </template>
+            </b-table>
+          </div>
+
+          <!-- delete modal -->
+          <b-modal id="DeleteModal" centered hide-header hide-footer>
+            <div class="p-5 text-center">
+              <Spinner v-if="isDeleting" size="4" />
+              <template v-else>
+                <h5>Confirm delete subject?</h5>
+
+                <p>This action cannot be undone.</p>
+
+                <div>
                   <b-button
-                    variant="primary"
-                    size="sm"
-                    class="px-3"
-                    @click="setToEditing(data.item.id)"
+                    variant="light"
+                    class="px-4 mr-2 border"
+                    @click="handleCancelDelete"
                   >
-                    <b-icon icon="pencil" class="mr-1"> </b-icon>
-                    Edit
+                    Cancel
                   </b-button>
-                </template>
-              </b-table>
+
+                  <b-button
+                    variant="danger"
+                    class="px-4"
+                    @click="handleDeleteSection"
+                  >
+                    Delete
+                  </b-button>
+                </div>
+              </template>
             </div>
-       
+          </b-modal>
+          <!-- end -->
 
           <!-- Add Classes -->
           <div class="margin-down">
@@ -160,6 +199,7 @@ import Swal from 'sweetalert2'
 import { SECTION_QUERIES, SECTION_QUERY } from '~/graphql/sections/queries'
 import {
   CREATE_SECTION_MUTATION,
+  DELETE_SECTION_MUTATION,
   UPDATE_SECTION_MUTATION,
 } from '~/graphql/sections/mutations'
 import { KLASE_QUERIES } from '~/graphql/klases/queries'
@@ -170,6 +210,8 @@ export default {
   middleware: 'auth',
   data() {
     return {
+      invokedForDelete: null,
+      isDeleting: false,
       id: 0,
       sectionEditingId: '',
       section: {},
@@ -333,13 +375,9 @@ export default {
                   klase_id: parseInt(this.form.class),
                 },
               })
-              // console.log(this.form.class);
 
               data.sections.push(createSection)
-              // console.log(dataCopy)
 
-              // Write our data back to the cache.
-              // Write back to the cache
               store.writeQuery({
                 query: SECTION_QUERIES,
                 variables: {
@@ -377,6 +415,74 @@ export default {
           })
         }
       }
+    },
+
+    // -------- delete mutation -------------- //
+    handleCancelDelete() {
+      this.invokedForDelete = null
+
+      this.$bvModal.hide('DeleteModal')
+    },
+
+    handleDeleteSubject(item) {
+      this.invokedForDelete = item
+
+      this.$bvModal.show('DeleteModal')
+    },
+    // ------delete ----------/
+    handleDeleteSection() {
+      this.isDeleting = true
+      const deleteId = this.invokedForDelete.id
+      this.$apollo
+        .mutate({
+          mutation: DELETE_SECTION_MUTATION,
+          variables: {
+            id: parseInt(deleteId),
+          },
+          update: (store, { data: { deleteSection } }) => {
+            const data = store.readQuery({
+              query: SECTION_QUERIES,
+              variables: {
+                klase_id: parseInt(this.form.class),
+                workspaceId: parseInt(this.mainWorkspace.id),
+              },
+            })
+
+            const index = data.sections.findIndex((m) => m.id === deleteId)
+            if (index !== -1) {
+              // Mutate cache result
+              data.sections.splice(index, 1)
+
+              store.writeQuery({
+                query: SECTION_QUERIES,
+                variables: {
+                  klase_id: parseInt(this.form.class),
+                  workspaceId: parseInt(this.mainWorkspace.id),
+                },
+                data,
+              })
+            }
+          },
+        })
+        .then(() => {
+          Swal.fire({
+            timer: 1000,
+            text: 'section deleted successfully',
+            position: 'top-right',
+            color: '#fff',
+            background: '#4bb543',
+            toast: false,
+            backdrop: false,
+            showConfirmButton: false,
+          })
+          this.isDeleting = false
+        })
+        .catch(() => {})
+        .finally(() => {
+          this.$bvModal.hide('DeleteModal')
+
+          this.isDeleting = false
+        })
     },
   },
 }

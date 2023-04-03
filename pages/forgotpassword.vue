@@ -87,7 +87,6 @@ export default {
             },
           })
           .then(({ data }) => {
-            console.log(data)
 
             if (data.otpPasswordReset == null) {
               this.emailAlert = `There's no email associated with this account`

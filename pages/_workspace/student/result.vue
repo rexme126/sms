@@ -207,7 +207,7 @@ export default {
               klase_id: parseInt(this.form.class),
               student_id: parseInt(this.user.student.id),
               term_id: parseInt(this.form.term),
-
+              section_id: parseInt(this.user.student.section.id),
               session_id: parseInt(this.form.session),
               status: 'published',
               workspaceId: parseInt(this.mainWorkspace.id),
@@ -227,6 +227,7 @@ export default {
               klase_id: parseInt(this.form.class),
               student_id: parseInt(this.user.student.id),
               term_id: parseInt(this.form.term),
+              section_id: parseInt(this.user.student.section.id),
               session_id: parseInt(this.form.session),
               status: 'published',
               workspaceId: parseInt(this.mainWorkspace.id),

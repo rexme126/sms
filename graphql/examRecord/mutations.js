@@ -68,16 +68,16 @@ export const UPDATE_ATTENDANCE_MUTATION = gql`
 `
 export const UPDATE_RESUMPTION_MUTATION = gql`
   mutation UpdateResumtionMutation(
-    $term_start: String!
-    $term_end: String
     $term_id: Int!
+    $term_start: String!
+    $term_end: String!
     $session_id: Int!
-    $workspaceId: Int
+    $workspaceId: Int!
   ) {
     updateResumption(
+      term_id: $term_id
       term_start: $term_start
       term_end: $term_end
-      term_id: $term_id
       session_id: $session_id
       workspaceId: $workspaceId
     ) {

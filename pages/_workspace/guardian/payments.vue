@@ -13,21 +13,21 @@
               </b-form-group>
             </div>
 
-            <div v-else>
+            <div v-else class="student-width">
               <b-form-group label="Select Student">
                 <b-form-select v-model="form.student_id" class="mb-3">
-                  <b-form-select-option 
+                  <b-form-select-option
                     v-for="student in user.guardian.students"
                     :key="student.id"
                     :value="student.id"
                     >{{ student.last_name }} {{ student.first_name }}
                   </b-form-select-option>
-                  
+
                   <template #first>
-                      <b-form-select-option :value="null" disabled
-                        >-- select student--</b-form-select-option
-                      >
-                    </template>
+                    <b-form-select-option :value="null" disabled
+                      >-- select student--</b-form-select-option
+                    >
+                  </template>
                 </b-form-select>
               </b-form-group>
             </div>
@@ -154,3 +154,13 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.student-width {
+  width: 350px;
+
+  @include media-breakpoint-down(sm) {
+    width: 100%;
+  }
+}
+</style>

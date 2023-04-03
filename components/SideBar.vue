@@ -2,12 +2,10 @@
   <div class="sidebar-wrapper">
     <div
       class="aside shadow-sm"
-      :class="`${isCollasped == true ? 'is-expanded' : ''}`"
+      :class="`${isCollasped == true ? 'is-expanded' : 'not-expanded'}`"
     >
       <div class="logo">
-        <div
-          v-if="mainWorkspace.logo == null"
-        />
+        <div v-if="mainWorkspace.logo == null" />
         <img
           v-else
           :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/logo/${mainWorkspace.logo}`"
@@ -84,10 +82,7 @@
               <b-icon
                 icon="person-fill"
                 class="material-icons"
-                @click="
-                  caretDown()
-                  ToggleMenus()
-                "
+                @click="ToggleMenus()"
               />
               <span class="text" @click="ToggleMenus()"
                 >Payment
@@ -100,12 +95,13 @@
             </nuxt-link>
 
             <b-collapse
+              visible
               id="collapse-1"
               accordion="my-accordion"
               role="tabpanel"
               class="mt-2 dropMenuClose"
             >
-              <b-card bg-variant="light">
+              <b-card bg-variant="light" class="closeNavHeight">
                 <nuxt-link
                   :to="{
                     name: 'workspace-accountant-create-payment',
@@ -179,6 +175,21 @@
                 @click="ToggleMenus"
               />
               <span class="text" @click="ToggleMenus">Profile</span>
+            </nuxt-link>
+
+            <nuxt-link
+              :to="{
+                name: 'workspace-teacher-subjects-allocation',
+                params: { workspace: mainWorkspace.slug },
+              }"
+              class="button"
+            >
+              <b-icon
+                icon="alarm"
+                class="material-icons"
+                @click="ToggleMenus"
+              />
+              <span class="text" @click="ToggleMenus">Subjects Allocation</span>
             </nuxt-link>
 
             <nuxt-link
@@ -274,6 +285,21 @@
 
             <nuxt-link
               :to="{
+                name: 'workspace-student-subjects-allocation',
+                params: { workspace: mainWorkspace.slug },
+              }"
+              class="button"
+            >
+              <b-icon
+                icon="alarm"
+                class="material-icons"
+                @click="ToggleMenus"
+              />
+              <span class="text" @click="ToggleMenus">Subjects Allocation</span>
+            </nuxt-link>
+
+            <nuxt-link
+              :to="{
                 name: 'workspace-student-timetable',
                 params: { workspace: mainWorkspace.slug },
               }"
@@ -341,6 +367,7 @@
             </nuxt-link>
 
             <b-collapse
+            visible
               id="accordion-4"
               accordion="my-accordion"
               role="tabpanel"
@@ -348,7 +375,6 @@
             >
               <b-card bg-variant="light">
                 <nuxt-link
-                  t
                   :to="{
                     name: 'workspace-student-payment',
                     params: { workspace: mainWorkspace.slug },
@@ -519,7 +545,7 @@
               <b-icon
                 icon="people"
                 class="material-icons"
-                @click="ToggleMenus()"
+                @click.prevent="ToggleMenus()"
               />
               <span class="text" @click="ToggleMenus()"
                 >Users
@@ -537,7 +563,7 @@
               role="tabpanel"
               class="mt-2 dropMenuClose"
             >
-              <b-card bg-variant="light">
+              <b-card bg-variant="light" class="closeNavHeight">
                 <nuxt-link
                   :to="{
                     name: 'workspace-admin-teacher',
@@ -613,7 +639,7 @@
               role="tabpanel"
               class="mt-2 dropMenuClose"
             >
-              <b-card bg-variant="light">
+              <b-card bg-variant="light" class="closeNavHeight">
                 <nuxt-link
                   :to="{
                     name: 'workspace-admin-exam-timetable',
@@ -806,7 +832,7 @@
               role="tabpanel"
               class="mt-2 dropMenuClose"
             >
-              <b-card bg-variant="light">
+              <b-card bg-variant="light" class="closeNavHeight">
                 <nuxt-link
                   :to="{
                     name: 'workspace-admin-timetable',
@@ -879,6 +905,21 @@
                     @click="ToggleMenus"
                   />
                   <span class="text" @click="ToggleMenus">Subjects</span>
+                </nuxt-link>
+
+                <nuxt-link
+                  :to="{
+                    name: 'workspace-admin-assign-subject-to-teachers',
+                    params: { workspace: mainWorkspace.slug },
+                  }"
+                  class="button"
+                >
+                  <b-icon
+                    icon="text-indent-left"
+                    class="material-icons"
+                    @click="ToggleMenus"
+                  />
+                  <span class="text" @click="ToggleMenus">Assign Subjects</span>
                 </nuxt-link>
               </b-card>
             </b-collapse>
@@ -961,7 +1002,7 @@
               role="tabpanel"
               class="mt-2 dropMenuClose"
             >
-              <b-card bg-variant="light">
+              <b-card bg-variant="light" class="closeNavHeight">
                 <nuxt-link
                   :to="{
                     name: 'workspace-admin-teacher',
@@ -1052,7 +1093,7 @@
               role="tabpanel"
               class="mt-2 dropMenuClose"
             >
-              <b-card bg-variant="light">
+              <b-card bg-variant="light" class="closeNavHeight">
                 <nuxt-link
                   :to="{
                     name: 'workspace-admin-exam-timetable',
@@ -1245,7 +1286,7 @@
               role="tabpanel"
               class="mt-2 dropMenuClose"
             >
-              <b-card bg-variant="light">
+              <b-card bg-variant="light" class="closeNavHeight">
                 <nuxt-link
                   :to="{
                     name: 'workspace-admin-timetable',
@@ -1318,6 +1359,21 @@
                     @click="ToggleMenus"
                   />
                   <span class="text" @click="ToggleMenus">Subjects</span>
+                </nuxt-link>
+
+                <nuxt-link
+                  :to="{
+                    name: 'workspace-admin-assign-subject-to-teachers',
+                    params: { workspace: mainWorkspace.slug },
+                  }"
+                  class="button"
+                >
+                  <b-icon
+                    icon="text-indent-left"
+                    class="material-icons"
+                    @click="ToggleMenus"
+                  />
+                  <span class="text" @click="ToggleMenus">Assign Subjects</span>
                 </nuxt-link>
               </b-card>
             </b-collapse>
@@ -1395,24 +1451,20 @@
               <span class="text" @click="ToggleMenus">Due Payment</span>
             </nuxt-link>
 
-            <div class="d-flex"></div>
-
-            <div class="menu">
-              <nuxt-link
-                :to="{
-                  name: 'workspace-admin-settings',
-                  params: { workspace: mainWorkspace.slug },
-                }"
-                class="button"
-              >
-                <b-icon
-                  icon="gear-fill"
-                  class="material-icons"
-                  @click="ToggleMenus"
-                />
-                <span class="text" @click="ToggleMenus">Settings</span>
-              </nuxt-link>
-            </div>
+            <nuxt-link
+              :to="{
+                name: 'workspace-admin-settings',
+                params: { workspace: mainWorkspace.slug },
+              }"
+              class="button"
+            >
+              <b-icon
+                icon="gear-fill"
+                class="material-icons"
+                @click="ToggleMenus"
+              />
+              <span class="text" @click="ToggleMenus">Settings</span>
+            </nuxt-link>
           </div>
         </span>
       </div>
@@ -1439,6 +1491,7 @@ export default {
       return this.currentWorkspace
     },
   },
+
   apollo: {
     user: {
       query: ROLEX_QUERIEX,
@@ -1447,11 +1500,12 @@ export default {
       },
     },
   },
+
   methods: {
     ...mapActions(useToggleMenu, ['toggleIcon']),
+
     ToggleMenus() {
       this.toggleIcon(true)
-
       this.windowWidth = window.innerWidth
       if (this.windowWidth <= 750) {
         this.toggleIcon(false)
@@ -1497,13 +1551,14 @@ export default {
 
     .dropMenuClose {
       .button {
+        width: 108%;
         &.nuxt-link-exact-active {
           border-radius: 0 !important;
-          border-left: 0px solid red !important;
+          border-left: -5px solid red !important;
           width: 108%;
         }
         &:hover {
-          border-left: 0px solid red !important;
+          border-left: -5px solid red !important;
           border-radius: 0 !important;
           width: 108%;
         }
@@ -1589,6 +1644,9 @@ export default {
       h3 {
         opacity: 1;
       }
+      .text {
+        white-space: nowrap;
+      }
       .button .text {
         display: block;
         margin-left: 15px;
@@ -1626,6 +1684,21 @@ export default {
           }
         }
       }
+    }
+
+    &.not-expanded {
+      .closeNavHeight {
+        display: none;
+      }
+      // .menu {
+      //   .button:hover {
+      //     background-color: var(--color-primary);
+      //     .text{
+      //      width:250px;
+      //     }
+
+      //   }
+      // }
     }
 
     @include media-breakpoint-down(sm) {

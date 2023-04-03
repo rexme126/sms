@@ -461,8 +461,8 @@ export default {
             showConfirmButton: false,
           })
         })
-        .catch((e) => {
-          console.log(e)
+        .catch(() => {
+          
         })
         .finally(() => {
           this.$bvModal.hide('DeleteModal')

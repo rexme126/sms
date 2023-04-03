@@ -205,7 +205,7 @@
 
                 <!-- view modal -->
                 <template #cell(actions)="data">
-                  <b-button
+                  <!-- <b-button
                     variant="danger"
                     size="md"
                     class="px-3"
@@ -214,7 +214,7 @@
                     @click="getModal(data.item.id)"
                   >
                     Reset
-                  </b-button>
+                  </b-button> -->
 
                   <b-button
                     v-show="data.item.amt_paid > 0"
@@ -243,30 +243,29 @@
                     pdf-content-width=""
                   >
                     <section slot="pdf-content">
-                      <b-card>
+                      <b-card class="display">
                         <div
-                          class="display"
                           style="padding: 8px; margin: auto; min-height: 100vh"
                         >
                           <div class="mt-4">
                             <div class="text-center mb-4">
-                              <img
-                                v-if="mainWorkspace.logo == null"
-                                src="@/assets/svg/ronazon-logo.svg"
-                                alt="logo"
-                                width="100"
-                              />
-                              <img
-                                v-else
-                                :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/logo/${mainWorkspace.logo}`"
-                                alt="logo"
-                                width="50"
-                              />
+                              <div v-if="mainWorkspace.logo == null"></div>
+                              <div v-else-if="encodedImages">
+                                <img
+                                  :src="`data:image/png;base64,${encodedImages.logo}`"
+                                  alt="logo"
+                                  width="100"
+                                />
+                              </div>
                             </div>
 
                             <h1
                               class="text-center"
-                              style="color: #1c0988; font-weight: bold"
+                              style="
+                                color: #1c0988;
+                                text-transform: uppercase;
+                                font-weight: bold;
+                              "
                             >
                               {{ mainWorkspace.name }}
                             </h1>
@@ -287,28 +286,21 @@
                           </div>
 
                           <div
-                            class="d-flex justify-content-align mt-2 p-3"
+                            class="d-flex justify-content-align mt-2 mb-2 p-2"
                             style="background-color: #007bff; color: #fff"
                           >
                             STUDENT INFORMATION
                           </div>
 
                           <div class="d-flex justify-content-center">
-                            <b-img
-                              v-if="data.item.student.photo == null"
-                              class="mt-3"
-                              thumbnail
-                              src="@/assets/svg/graduate-student.svg"
-                              alt="student"
-                              width="100"
-                            ></b-img>
-                            <b-img
-                              v-else
-                              :show="true"
-                              :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${data.item.student.photo}`"
-                              alt="student"
-                              width="200"
-                            ></b-img>
+                            <div v-if="data.item.student.photo == null"></div>
+                            <div v-else-if="encodedImages">
+                              <b-img
+                                :src="`data:image/png;base64,${encodedImages.photoBase64}`"
+                                alt="photo"
+                                width="100"
+                              ></b-img>
+                            </div>
                           </div>
 
                           <div class="d-flex justify-content-between mt-4">
@@ -333,7 +325,7 @@
                           </div>
 
                           <h5
-                            class="d-flex justify-content-align mt-4 p-3"
+                            class="d-flex justify-content-align mt-4 mb-2 p-2"
                             style="background-color: #007bff; color: #fff"
                           >
                             PAYMENT INFORMATION
@@ -644,21 +636,25 @@
                   >
                     <section slot="pdf-content">
                       <div class="display" style="padding: 2rem; margin: auto">
-                        <div class="mt-3 mb-3">
-                          <div class="text-center mb-3">
+                        <div class="mt-3 mb-4">
+                          <div class="text-center mb-2">
                             <div v-if="mainWorkspace.logo == null"></div>
-                            <b-img
-                              v-else
-                              :show="true"
-                              :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/logo/${mainWorkspace.logo}`"
-                              alt="logo"
-                              width="100"
-                            ></b-img>
+                            <div v-else-if="encodedImages">
+                              <b-img
+                                :src="`data:image/png;base64,${encodedImages.logoBase64}`"
+                                alt="logo"
+                                width="100"
+                              ></b-img>
+                            </div>
                           </div>
 
                           <h2
                             class="text-center"
-                            style="color: #1c0988; font-weight: bold"
+                            style="
+                              color: #1c0988;
+                              text-transform: uppercase;
+                              font-weight: bold;
+                            "
                           >
                             {{ mainWorkspace.name }}
                           </h2>
@@ -679,21 +675,25 @@
                         </div>
 
                         <div
-                          class="d-flex justify-content-align mt-2 p-2"
-                          style="background-color: #007bff; color: #fff"
+                          class="d-flex justify-content-align mt-4 mb-2 p-2"
+                          style="
+                            background-color: #007bff;
+                            font-weight: bold;
+                            color: #fff;
+                          "
                         >
                           STUDENT INFORMATION
                         </div>
 
                         <div class="d-flex justify-content-center">
                           <div v-if="data.item.student.photo == null"></div>
-                          <b-img
-                            v-else
-                            :show="true"
-                            :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${data.item.student.photo}`"
-                            alt="student"
-                            width="200"
-                          ></b-img>
+                          <div v-else-if="encodedImages">
+                            <b-img
+                              :src="`data:image/png;base64,${encodedImages.photoBase64}`"
+                              alt="photo"
+                              width="100"
+                            ></b-img>
+                          </div>
                         </div>
 
                         <div class="d-flex justify-content-between mt-4">
@@ -719,7 +719,11 @@
 
                         <h5
                           class="d-flex justify-content-align mt-3 p-2"
-                          style="background-color: #007bff; color: #fff"
+                          style="
+                            background-color: #007bff;
+                            font-weight: bold;
+                            color: #fff;
+                          "
                         >
                           PAYMENT INFORMATION
                         </h5>
@@ -785,6 +789,7 @@ import {
   RESET_PAYMENT_RECORD_MUTATION,
 } from '~/graphql/payments/mutations'
 import { PAYMENT_RECORD_QUERIES } from '~/graphql/payments/queries'
+import { ENCODED_IMAGE_QUERIES } from '~/graphql/students/queries'
 export default {
   props: {
     paymentRecords: Array,
@@ -876,7 +881,7 @@ export default {
       totalRows: 1,
       currentPage: 1,
       perPage: 5,
-      pageOptions: [10, 25, 50, { value: 100, text: 'Show a lot' }],
+      pageOptions: [50, 100, { value: 200, text: 'Show a lot' }],
       sortBy: '',
       sortDesc: false,
       sortDirection: 'asc',
@@ -884,6 +889,17 @@ export default {
       filterOn: [],
       infoModal: 'info-modal',
     }
+  },
+  apollo: {
+    encodedImages: {
+      query: ENCODED_IMAGE_QUERIES,
+      variables() {
+        return {
+          studentId: 4,
+          workspaceId: parseInt(this.mainWorkspace.id),
+        }
+      },
+    },
   },
   computed: {
     sortOptions() {
@@ -915,52 +931,52 @@ export default {
       this.totalRows = filteredItems.length
       this.currentPage = 1
     },
-    getModal(item) {
-      this.id = item
-      this.$bvModal.show(this.infoModal)
-    },
-    resetPayment() {
-      this.resetBusy = true
-      this.$apollo
-        .mutate({
-          mutation: RESET_PAYMENT_RECORD_MUTATION,
-          variables: {
-            id: parseInt(this.id),
-            workspaceId: parseInt(this.mainWorkspace.id),
-          },
-          update: (store, { data: { createPaymentRecord } }) => {
-            // Read the data from our cache for this query.
-            const data = store.readQuery({
-              query: PAYMENT_RECORD_QUERIES,
-              variables: {
-                klase_id: parseInt(this.student[0]),
-                session_id: parseInt(this.student[2]),
-                term_id: parseInt(this.student[1]),
-                workspaceId: parseInt(this.mainWorkspace.id),
-              },
-            })
+    // getModal(item) {
+    //   this.id = item
+    //   this.$bvModal.show(this.infoModal)
+    // },
+    // resetPayment() {
+    //   this.resetBusy = true
+    //   this.$apollo
+    //     .mutate({
+    //       mutation: RESET_PAYMENT_RECORD_MUTATION,
+    //       variables: {
+    //         id: parseInt(this.id),
+    //         workspaceId: parseInt(this.mainWorkspace.id),
+    //       },
+    //       update: (store, { data: { createPaymentRecord } }) => {
+    //         // Read the data from our cache for this query.
+    //         const data = store.readQuery({
+    //           query: PAYMENT_RECORD_QUERIES,
+    //           variables: {
+    //             klase_id: parseInt(this.student[0]),
+    //             session_id: parseInt(this.student[2]),
+    //             term_id: parseInt(this.student[1]),
+    //             workspaceId: parseInt(this.mainWorkspace.id),
+    //           },
+    //         })
 
-            data.paymentRecords = data.paymentRecords.filter((t) => {
-              return t.status === 'Due'
-            })
+    //         data.paymentRecords = data.paymentRecords.filter((t) => {
+    //           return t.status === 'Due'
+    //         })
 
-            store.writeQuery({
-              query: PAYMENT_RECORD_QUERIES,
-              variables: {
-                klase_id: parseInt(this.student[0]),
-                session_id: parseInt(this.student[2]),
-                term_id: parseInt(this.student[1]),
-                workspaceId: parseInt(this.mainWorkspace.id),
-              },
-              data,
-            })
-          },
-        })
-        .then(({ data }) => {
-          this.$bvModal.hide(this.infoModal)
-          this.resetBusy = false
-        })
-    },
+    //         store.writeQuery({
+    //           query: PAYMENT_RECORD_QUERIES,
+    //           variables: {
+    //             klase_id: parseInt(this.student[0]),
+    //             session_id: parseInt(this.student[2]),
+    //             term_id: parseInt(this.student[1]),
+    //             workspaceId: parseInt(this.mainWorkspace.id),
+    //           },
+    //           data,
+    //         })
+    //       },
+    //     })
+    //     .then(({ data }) => {
+    //       this.$bvModal.hide(this.infoModal)
+    //       this.resetBusy = false
+    //     })
+    // },
 
     payFee(item, value) {
       if (value > item.balance) {

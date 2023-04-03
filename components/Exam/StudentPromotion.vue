@@ -5,13 +5,21 @@
         ><h3 class="text-center p-4">No record found</h3></template
       >
       <template v-else>
-        <h2 class="p-4 text-center" style="font-weight: bold">
+        <h3 class="p-4 text-center" style="font-weight: bold">
           <span style="color: green"
             >({{ promoteStudents[0].klase.name }})</span
           >
           Student Result Section
-        </h2>
-        <b-table :items="promoteStudents" :responsive="true" :fields="fields">
+        </h3>
+        <div class="search-input-wrap mr-3 mb-3">
+          <b-form-input v-model="search" placeholder="Search..." /><b-icon
+            style="color: #111"
+            class="h5 mt-3 search-icon"
+            icon="search"
+          />
+        </div>
+
+        <b-table :items="filterResult" :responsive="true" :fields="fields">
           <template #cell(#)="data">
             {{ data.index + 1 }}
           </template>
@@ -23,7 +31,7 @@
           <template #cell(photo)="data">
             <b-avatar
               variant="primary"
-              :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${data.item.student.photo}`"
+              :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${data.item.photo}`"
             >
             </b-avatar>
           </template>
@@ -38,7 +46,7 @@
         </b-table>
 
         <div class="text-center mb-4" @click="createPromoteStudents">
-          <b-button :disabled="busy" variant="success" size="lg">
+          <b-button :disabled="busy" variant="success" size="md">
             <b-spinner
               v-if="busy"
               variant="light"
@@ -71,6 +79,7 @@ export default {
       busy: false,
       set: null,
       avg: '',
+      search: '',
       fields: [
         {
           key: '#',
@@ -112,12 +121,21 @@ export default {
     }
   },
   computed: {
-    promotioMark() {
-      return this.setPromotion.name
-    },
+    // promotionMark() {
+    //   return this.setPromotion.name
+    // },
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
     }),
+    filterResult() {
+      return this.promoteStudents.filter((t) => {
+        return (
+          t.first_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.last_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.adm_no.match(parseInt(this.search))
+        )
+      })
+    },
   },
 
   methods: {
@@ -231,3 +249,26 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.search-input-wrap {
+  width: 270px;
+  position: relative;
+  display: flex;
+
+  & .search-icon {
+    position: absolute;
+    right: 11px;
+    top: -8px;
+  }
+
+  .form-control {
+    border-radius: 30px;
+    font-size: 0.85rem;
+    padding: 20px 30px;
+    height: 35px;
+    background-color: rgba(#d9ecff, 0.5);
+    // border-color: transparent;
+  }
+}
+</style>

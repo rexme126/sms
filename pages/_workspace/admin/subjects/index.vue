@@ -69,272 +69,154 @@
       </b-card>
 
       <!--  -->
-      <div
-        v-show="timetableDropdownClass"
-        class="p-4"
-        style="background-color: #fff"
-        @click="hideMenu"
-      >
-        <b-card no-body @click="hideMenu">
-          <b-tabs card>
-            <b-tab active @click="hideMenu">
-              <template #title>
-                <b-icon icon="plus" /><strong>Create Subjects</strong>
-              </template>
+      <b-card v-show="timetableDropdownClass" class="p-4">
+        <div class="p-3">
+          <h4 class="mb-3">All Classes</h4>
+          <b-table :items="subjects" :fields="fields">
+            <template #cell(#)="data">
+              {{ data.index + 1 }}
+            </template>
 
-              <div class="p-4">
-                <div class="p-3">
-                  <h4 class="mb-3">All Classes</h4>
-                  <b-table :items="subjects" :fields="fields">
-                    <template #cell(#)="data">
-                      {{ data.index + 1 }}
-                    </template>
-                    <template #cell(subject)="data">
-                      <div v-if="subjectEditingId == data.item.id">
-                        <b-row no-gutters>
-                          <b-col md="4">
-                            <input
-                              v-model="form.subjects"
-                              style="width: 10rem"
-                              type="text"
-                              required
-                              size="lg"
-                              @blur="updatingSubject(data.value)"
-                              @keydown.enter="editFiled(data.item.id)"
-                            />
-                          </b-col>
-                        </b-row>
-                      </div>
+            <template #cell(actions)="data">
+              <b-button
+                variant="primary"
+                size="sm"
+                class="px-3"
+                @click="handleEditing(data.item)"
+              >
+                <b-icon icon="pencil" class="mr-1"> </b-icon>
+                Edit
+              </b-button>
 
-                      <div v-else @click="setToEditing(data.item.id)">
-                        {{ data.item.subject }}
-                      </div>
-                    </template>
+              <b-button
+                variant="danger"
+                size="sm"
+                class="px-3"
+                @click="handleDeleteSubject(data.item)"
+              >
+                <b-icon icon="trash" class="mr-1"> </b-icon>
+                Delete
+              </b-button>
+            </template>
+          </b-table>
+        </div>
 
-                    <!-- teachers -->
-                    <template #cell(teachers)="data">
-                      <b-badge
-                        :id="`teachers-${data.index}`"
-                        variant="info"
-                        class="px-2"
-                      >
-                        {{ data.value.length }} Teacheers
-                      </b-badge>
-                      <b-popover
-                        v-if="data.value.length > 0"
-                        :target="`teachers-${data.index}`"
-                        triggers="hover click"
-                      >
-                        <b-nav vertical>
-                          <b-nav-item
-                            v-for="teacher in data.value"
-                            :key="teacher.id"
-                          >
-                            <h5>
-                              <nuxt-link :to="`/admin/teacher/${teacher.slug}`">
-                                {{ teacher.first_name }}
-                                {{ teacher.last_name }}</nuxt-link
-                              >
-                            </h5>
-                          </b-nav-item>
-                        </b-nav>
-                      </b-popover>
-                    </template>
+        <!-- Info modal -->
+        <AdminEditSubjectModal
+          v-if="invokedForEdit"
+          v-model="isEditSubjectModal"
+          :subject="invokedForEdit"
+        />
 
-                    <template #cell(actions)="data">
-                      <b-button
-                        variant="primary"
-                        size="sm"
-                        class="px-3"
-                        @click="setToEditing(data.item.id)"
-                      >
-                        <b-icon icon="pencil" class="mr-1"> </b-icon>
-                        Edit
-                      </b-button>
+        <!-- end modal -->
 
-                      <b-button
-                        v-if="data.item.id == loadingId"
-                        variant="danger"
-                        size="sm"
-                        class="px-3"
-                        @click="deleteSubject(data.item.id)"
-                      >
-                        <b-spinner
-                          class="mb-1 mr-1"
-                          small
-                          variant="light"
-                          v-if="loading"
-                        />
-                        Revoke teacher
-                      </b-button>
+        <!-- delete modal -->
+        <b-modal id="DeleteModal" centered hide-header hide-footer>
+          <div class="p-5 text-center">
+            <Spinner v-if="isDeleting" size="4" />
+            <template v-else>
+              <h5>Confirm delete subject?</h5>
 
-                      <b-button
-                        v-else
-                        variant="danger"
-                        size="sm"
-                        class="px-3"
-                        @click="deleteSubject(data.item.id)"
-                      >
-                        Revoke teacher
-                      </b-button>
-                    </template>
-                  </b-table>
-                </div>
-              </div>
+              <p>This action cannot be undone.</p>
 
-              <!-- Add Classes -->
-              <div class="margin-down">
-                <!-- description -->
-                <b-form
-                  method="POST"
-                  @submit.prevent="onSubmitCreate"
-                  @keydown="form.onKeydown($event)"
-                  @reset.prevent="onReset"
+              <div>
+                <b-button
+                  variant="light"
+                  class="px-4 mr-2 border"
+                  @click="handleCancelDelete"
                 >
-                  <!-- description -->
-                  <b-row no-gutters>
-                    <b-col md="2">
-                      <label
-                        for="input-small"
-                        class="label-padding"
-                        style="font-size: 18px"
-                        >Name:</label
-                      >
-                    </b-col>
+                  Cancel
+                </b-button>
 
-                    <b-col md="4">
-                      <b-form-group>
-                        <b-form-input
-                          v-model="form.subject"
-                          placeholder="Enter subject"
-                          type="text"
-                          required
-                          size="lg"
-                        ></b-form-input>
-                        <b-form-invalid-feedback
-                          :state="!form.errors.has('subject')"
-                        >
-                          {{ form.errors.get('subject') }}
-                        </b-form-invalid-feedback>
-                      </b-form-group>
-
-                      <b-button
-                        type="submit"
-                        variant="primary"
-                        class="mr-4"
-                        size="md"
-                        :disabled="form.busy"
-                      >
-                        <b-spinner
-                          v-if="form.busy"
-                          variant="light"
-                          class="mr-1 mb-1"
-                          small
-                        />Add Subject</b-button
-                      >
-                    </b-col>
-                  </b-row>
-                </b-form>
+                <b-button variant="danger" class="px-4" @click="deleteSubject">
+                  Delete
+                </b-button>
               </div>
-            </b-tab>
+            </template>
+          </div>
+        </b-modal>
+        <!-- end -->
 
-            <b-tab>
-              <template #title>
-                <strong>Assign Teachers</strong>
-              </template>
-
-              <div class="margin-down">
-                <!-- description -->
-
-                <b-form
-                  method="POST"
-                  @submit.prevent="assignSubjectToTeacher"
-                  @keydown="form.onKeydown($event)"
-                  @reset.prevent="onReset"
+        <!-- Add Classes -->
+        <div class="p-4">
+          <!-- description -->
+          <b-form
+            method="POST"
+            @submit.prevent="onSubmitCreate"
+            @keydown="form.onKeydown($event)"
+            @reset.prevent="onReset"
+          >
+            <!-- description -->
+            <b-row>
+              <b-col md="1">
+                <label
+                  for="input-small"
+                  class="label-padding"
+                  style="font-size: 18px"
+                  >Subject:</label
                 >
-                  <b-row class="mb-4">
-                    <b-col md="2">
-                      <h5 for="input-small" class="label-padding"
-                        >Subjects:</h5
-                      >
-                    </b-col>
+              </b-col>
 
-                    <b-col md="4">
-                      <b-form-group>
-                        <b-form-select
-                          id="subjects"
-                          v-model="subjectx"
-                          style="height: 18rem"
-                          value-field="id"
-                          text-field="subject"
-                          :options="subjects"
-                          multiple
-                          required
-                          class="mb-3"
-                          size="lg"
-                        >
-                        </b-form-select>
-                      </b-form-group>
-                    </b-col>
-                  </b-row>
+              <b-col md="4">
+                <b-form-group>
+                  <b-form-input
+                    v-model="form.subject"
+                    placeholder="Enter subject"
+                    type="text"
+                    required
+                    size="md"
+                  ></b-form-input>
+                  <b-form-invalid-feedback :state="!form.errors.has('subject')">
+                    {{ form.errors.get('subject') }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
+              </b-col>
+            </b-row>
 
-                  <b-row class="py-4">
-                    <b-col md="2">
-                      <h5 for="input-small" class="label-padding"
-                        >Assign Teacher:</h5
-                      >
-                    </b-col>
-                    <b-col md="4">
-                      <b-form-group label="">
-                        <b-form-select
-                          id="teachers"
-                          v-model="form.teacher"
-                          value-field="id"
-                          text-field="first_name"
-                          :options="teachers"
-                          required
-                          class="mb-3"
-                          size="lg"
-                        >
-                          <!-- This slot appears above the options from 'options' prop -->
-                          <template #first>
-                            <b-form-select-option :value="null" disabled
-                              >-- select teacher--</b-form-select-option
-                            >
-                          </template>
+            <b-row>
+              <b-col md="1">
+                <label
+                  for="input-small"
+                  class="label-padding"
+                  style="font-size: 18px"
+                  >Subject Code:</label
+                >
+              </b-col>
+              <b-col md="4">
+                <b-form-group>
+                  <b-form-input
+                    v-model="form.subject_code"
+                    placeholder="Enter subject code"
+                    type="text"
+                    required
+                    size="md"
+                  ></b-form-input>
+                  <b-form-invalid-feedback
+                    :state="!form.errors.has('subject_code')"
+                  >
+                    {{ form.errors.get('subject_code') }}
+                  </b-form-invalid-feedback>
+                </b-form-group>
 
-                          <!-- These options will appear after the ones from 'options' prop -->
-                        </b-form-select>
-                      </b-form-group>
-                    </b-col>
-                  </b-row>
-
-                  <b-row>
-                    <b-col
-                      md="10"
-                      class="d-flex justify-content-center p-4 mt-2 mb-4"
-                      ><b-button
-                        type="submit"
-                        variant="primary"
-                        class="mr-4"
-                        :disabled="busy"
-                        size="md"
-                      >
-                        <b-spinner
-                          v-if="busy"
-                          variant="light"
-                          class="mr-1 mb-1"
-                          small
-                        />Submit</b-button
-                      >
-                    </b-col>
-                  </b-row>
-                </b-form>
-              </div>
-            </b-tab>
-          </b-tabs>
-        </b-card>
-      </div>
+                <b-button
+                  type="submit"
+                  variant="primary"
+                  class="mr-4"
+                  size="md"
+                  :disabled="form.busy"
+                >
+                  <b-spinner
+                    v-if="form.busy"
+                    variant="light"
+                    class="mr-1 mb-1"
+                    small
+                  />Add Subject</b-button
+                >
+              </b-col>
+            </b-row>
+          </b-form>
+        </div>
+      </b-card>
     </template>
   </div>
 </template>
@@ -343,42 +225,35 @@
 import { mapState } from 'pinia'
 import { useWorkspaceStore } from '@/stores/wokspace'
 import Swal from 'sweetalert2'
-import { SUBJECT_QUERIES, SUBJECT_QUERY } from '@/graphql/subjects/queries'
+import { SUBJECT_QUERIES } from '@/graphql/subjects/queries'
 import {
-  UPDATE_SUBJECT_MUTATION,
   CREATE_SUBJECT_MUTATION,
   DELETE_SUBJECT_MUTATION,
-  ASSIGN_SUBJECT_TO_TEACHER_MUTATION,
 } from '@/graphql/subjects/mutations'
-import { TEACHERS_QUERIES } from '~/graphql/teachers/queries'
 import { KLASE_QUERIES } from '~/graphql/klases/queries'
 import { SECTION_QUERIES } from '~/graphql/sections/queries'
 import Preload from '~/components/Preload.vue'
+import AdminEditSubjectModal from '~/components/AdminEdit/SubjectModal.vue'
 
 export default {
-  components: { Preload },
+  components: { Preload, AdminEditSubjectModal },
   middleware: 'auth',
   data() {
     return {
+      invokedForEdit: null,
+      isEditSubjectModal: false,
       isBusy: false,
       loading: false,
-      loadingId: null,
-      id: 0,
+      invokedForDelete: null,
+      isDeleting: false,
       subjects: [],
-      teachers: [],
-      subjectEditingId: '',
-      editSlug: '',
-      subject: {},
-      subjectx: [],
       busy: false,
       form: new this.$form({
-        id: 0,
         class: null,
         section: null,
         klase: null,
         subject: null,
-        subjects: [],
-        teacher: null,
+        subject_code: null,
         busy: false,
       }),
       fields: [
@@ -390,7 +265,11 @@ export default {
           key: 'subject',
           sortable: false,
         },
-        { key: 'teachers' },
+        {
+          key: 'subject_code',
+          label: 'Subject Code',
+          sortable: false,
+        },
         {
           key: 'actions',
           sortable: false,
@@ -419,22 +298,10 @@ export default {
         }
       },
     },
-
-    teachers: {
-      query: TEACHERS_QUERIES,
-      variables() {
-        return {
-          workspaceId: parseInt(this.mainWorkspace.id),
-        }
-      },
-    },
   },
   computed: {
     nowLoading() {
-      return (
-        this.$apollo.queries.klases.loading &&
-        this.$apollo.queries.teachers.loading
-      )
+      return this.$apollo.queries.klases.loading
     },
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
@@ -442,12 +309,6 @@ export default {
   },
 
   methods: {
-    hideMenu() {
-      if (this.registerMenu === true) {
-        this.registerMenu = false
-        this.registrationMenuClass = ''
-      }
-    },
     timetableDropdown() {
       this.isBusy = true
       this.timetableDropdownClass = false
@@ -476,70 +337,9 @@ export default {
     },
 
     // inline editing
-    setToEditing(item) {
-      this.subjectEditingId = item
-      this.id = item
-
-      if (this.id > 0) {
-        this.$apollo.addSmartQuery('subject', {
-          query: SUBJECT_QUERY,
-          variables() {
-            return {
-              id: parseInt(this.id),
-              workspaceId: parseInt(this.mainWorkspace.id),
-            }
-          },
-          result({ data, loading }) {
-            if (!loading) {
-              this.form.id = parseInt(data.subject.id)
-              this.form.subjects = data.subject.subject
-            }
-          },
-        })
-      }
-    },
-    updatingSubject() {
-      this.subjectEditingId = ''
-    },
-    // ------- edit ----//
-    editFiled(item) {
-      this.$apollo
-        .mutate({
-          mutation: UPDATE_SUBJECT_MUTATION,
-          variables: {
-            id: parseInt(item),
-            subject: this.form.subjects,
-            workspaceId: parseInt(this.mainWorkspace.id),
-          },
-        })
-        .then(() => {
-          this.subjectEditingId = ''
-          Swal.fire({
-            text: `subject updated successfully!`,
-            position: 'top-right',
-            color: '#fff',
-            background: '#5cb85c',
-            toast: false,
-            backdrop: false,
-            timer: 1500,
-            showConfirmButton: false,
-          })
-        })
-        .catch(({ graphQLErrors }) => {
-          this.form.busy = false
-
-          Swal.fire({
-            icon: 'warning',
-            text: `There's error proccessing this page!`,
-            position: 'top-right',
-            color: '#fff',
-            background: '#cc3300',
-            toast: false,
-            backdrop: false,
-            timer: 1500,
-            showConfirmButton: false,
-          })
-        })
+    handleEditing(item) {
+      this.invokedForEdit = item
+      this.isEditSubjectModal = true
     },
 
     // ------create --------//
@@ -553,6 +353,7 @@ export default {
             mutation: CREATE_SUBJECT_MUTATION,
             variables: {
               subject: this.form.subject,
+              subject_code: this.form.subject_code.toUpperCase(),
               workspaceId: parseInt(this.mainWorkspace.id),
               klase_id: parseInt(this.form.class),
               section_id: parseInt(this.form.section),
@@ -567,12 +368,9 @@ export default {
                   section_id: parseInt(this.form.section),
                 },
               })
-              // console.log(this.form.class);
 
               data.subjects.push(createSubject)
 
-              // Write our data back to the cache.
-              // Write back to the cache
               store.writeQuery({
                 query: SUBJECT_QUERIES,
                 variables: {
@@ -586,6 +384,7 @@ export default {
           })
           .then(() => {
             this.form.subject = ''
+            this.form.subject_code = ''
             Swal.fire({
               text: `subject added successfully!`,
               position: 'top-right',
@@ -611,12 +410,22 @@ export default {
         }
       }
     },
+    // -------- delete mutation -------------- //
+    handleCancelDelete() {
+      this.invokedForDelete = null
 
+      this.$bvModal.hide('DeleteModal')
+    },
+
+    handleDeleteSubject(item) {
+      this.invokedForDelete = item
+
+      this.$bvModal.show('DeleteModal')
+    },
     // ------delete ----------/
-    deleteSubject(item) {
-      this.loading = true
-      const deleteId = item
-      this.loadingId = deleteId
+    deleteSubject() {
+      this.isDeleting = true
+      const deleteId = this.invokedForDelete.id
       this.$apollo
         .mutate({
           mutation: DELETE_SUBJECT_MUTATION,
@@ -628,92 +437,47 @@ export default {
               query: SUBJECT_QUERIES,
               variables: {
                 workspaceId: parseInt(this.mainWorkspace.id),
+                klase_id: parseInt(this.form.class),
+                section_id: parseInt(this.form.section),
               },
             })
 
-            data.subjects.filter((m) => m.id !== deleteId)
-            data.subjects = deleteSubject
+            const index = data.subjects.findIndex((m) => m.id === deleteId)
+            if (index !== -1) {
+              // Mutate cache result
+              data.subjects.splice(index, 1)
 
-            // const index = data.subjects.findIndex((m) => m.id == deleteId)
-
-            store.readQuery({
-              query: SUBJECT_QUERIES,
-              variables: {
-                workspaceId: parseInt(this.mainWorkspace.id),
-              },
-              data,
-            })
+              store.writeQuery({
+                query: SUBJECT_QUERIES,
+                variables: {
+                  workspaceId: parseInt(this.mainWorkspace.id),
+                  klase_id: parseInt(this.form.class),
+                  section_id: parseInt(this.form.section),
+                },
+                data,
+              })
+            }
           },
         })
         .then(() => {
           Swal.fire({
             timer: 1000,
-            text: 'subject removed successfully',
+            text: 'subject deleted successfully',
             position: 'top-right',
             color: '#fff',
             background: '#4bb543',
             toast: false,
             backdrop: false,
+            showConfirmButton: false,
           })
-          this.loading = false
+          this.isDeleting = false
         })
-        .catch((e) => {
-          console.log(e)
-          // this.klase_id =
+        .catch(() => {})
+        .finally(() => {
+          this.$bvModal.hide('DeleteModal')
+
+          this.isDeleting = false
         })
-    },
-
-    async assignSubjectToTeacher() {
-      if (this.subjectx === [] || this.form.teacher === null) {
-        return false
-      } else {
-        this.subjectx.forEach((element) => {
-          const intValue = parseInt(element)
-          this.form.subjects.push(intValue)
-        })
-      }
-
-      this.busy = true
-      // submit exam
-      try {
-        await this.$apollo
-          .mutate({
-            mutation: ASSIGN_SUBJECT_TO_TEACHER_MUTATION,
-            variables: {
-              subjects: this.form.subjects,
-              teacher: parseInt(this.form.teacher),
-            },
-          })
-          .then(() => {
-            this.busy = false
-            this.form.subjects = []
-            this.form.teacher = ''
-            Swal.fire({
-              title: 'Done...',
-              icon: 'success',
-              timer: 1500,
-              text: 'Teacher(s) assigned successfully',
-              position: 'center',
-              color: '#fff',
-              background: '#4bb543',
-              toast: false,
-              backdrop: false,
-              showConfirmButton: false,
-            })
-          })
-
-        this.form.busy = false
-      } catch ({ graphQLErrors: errors }) {
-        this.form.busy = false
-        if (errors && errors.length > 0) {
-          const validationErrors = errors.filter(
-            (err) => err.extensions.category === 'validation'
-          )
-          validationErrors.forEach((err) => {
-            this.form.errors.set(err.extensions.validation)
-          })
-        }
-      }
     },
   },
 }

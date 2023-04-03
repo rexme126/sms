@@ -6,7 +6,15 @@
       >
 
       <template v-else class="p-3">
-        <h2 class="p-4 text-center">Reset Student Promotion</h2>
+        <h3 class="p-4 text-center">Reset Student Promotion</h3>
+        <div class="search-input-wrap mr-3 mb-3">
+          <b-form-input v-model="search" placeholder="Search..." />
+          <b-icon
+            style="color: #111"
+            class="h5 mt-3 search-icon"
+            icon="search"
+          />
+        </div>
 
         <div>
           <div class="table-responsive">
@@ -23,7 +31,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(reset, index) in resetPromotion" :key="reset.id">
+                <tr v-for="(reset, index) in filterResult" :key="reset.id">
                   <th scope="row">{{ index + 1 }}</th>
                   <td>
                     {{ reset.student.first_name }}
@@ -31,11 +39,12 @@
                   </td>
 
                   <td>
-                    <b-img
+                    <b-avatar
+                      variant="primary"
                       :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${reset.student.photo}`"
                       alt="photo"
                       width="30"
-                    />
+                    ></b-avatar>
                   </td>
 
                   <td>
@@ -52,7 +61,7 @@
                   <td>
                     <b-button
                       variant="warning"
-                      size="lg"
+                      size="md"
                       :disabled="resetId == reset.id"
                       @click="resetStudentPromotion(reset.id)"
                     >
@@ -74,7 +83,7 @@
             class="mb-4"
             variant="success"
             :disabled="busy"
-            size="lg"
+            size="md"
             @click="resetStudentsPromotion"
           >
             <b-spinner
@@ -102,12 +111,22 @@ import { RESET_PROMOTE_QUERIES } from '~/graphql/promotions/queries'
 import { UPDATE_PUBLISH_RESULT_MUTATION } from '~/graphql/examRecord/mutations'
 export default {
   props: {
-    resetPromotion: Array,
-    student: Array,
-    resetKlase: Object,
+    resetPromotion: {
+      type: Array,
+      required: false,
+    },
+    student: {
+      type: Array,
+      required: false,
+    },
+    resetKlase: {
+      type: Object,
+      required: false,
+    },
   },
   data() {
     return {
+      search: '',
       busy: false,
       resetId: null,
     }
@@ -116,6 +135,14 @@ export default {
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
     }),
+    filterResult() {
+      return this.resetPromotion.filter((t) => {
+        return (
+          t.student.first_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.student.last_name.toLowerCase().match(this.search.toLowerCase())
+        )
+      })
+    },
   },
 
   methods: {
@@ -150,7 +177,6 @@ export default {
               data.resetPromotion = data.resetPromotion.filter((t) => {
                 return t.from_class !== parseInt(klase)
               })
-              // data.resetPromotion = resetStudentsPromotion
 
               store.writeQuery({
                 query: RESET_PROMOTE_QUERIES,
@@ -276,3 +302,26 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.search-input-wrap {
+  width: 270px;
+  position: relative;
+  display: flex;
+
+  & .search-icon {
+    position: absolute;
+    right: 11px;
+    top: -8px;
+  }
+
+  .form-control {
+    border-radius: 30px;
+    font-size: 0.85rem;
+    padding: 20px 30px;
+    height: 35px;
+    background-color: rgba(#d9ecff, 0.5);
+    // border-color: transparent;
+  }
+}
+</style>

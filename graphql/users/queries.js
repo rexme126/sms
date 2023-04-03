@@ -103,14 +103,14 @@ export const ROLES_QUERIES = gql`
   }
 `
 
-export const PERMISSIONS_QUERY = gql`
-  query PermissionsQuery {
-    permissions {
-      ...PermissionFields
-    }
-  }
-  ${PERMISSION_FIELDS_FRAGMENT}
-`
+// export const PERMISSIONS_QUERY = gql`
+//   query PermissionsQuery {
+//     permissions {
+//       ...PermissionFields
+//     }
+//   }
+//   ${PERMISSION_FIELDS_FRAGMENT}
+// `
 
 export const USER_ROLE_QUERY = gql`
   query userRoles($id: ID!) {
@@ -124,18 +124,18 @@ export const USER_ROLE_QUERY = gql`
   }
   ${ROLE_FIELDS_FRAGMENT}
 `
-export const ROLES_AND_PERMISSION_QUERIES = gql`
-  query rolesQuery {
-    roles {
-      id
-      name
-      permissions {
-        id
-        name
-      }
-    }
-  }
-`
+// export const ROLES_AND_PERMISSION_QUERIES = gql`
+//   query rolesQuery {
+//     roles {
+//       id
+//       name
+//       permissions {
+//         id
+//         name
+//       }
+//     }
+//   }
+// `
 
 export const USER_WORKSPACE_QUERY = gql`
   query userWorkspace($id: ID) {
@@ -154,6 +154,11 @@ export const USER_WORKSPACE_QUERY = gql`
         bank
         account_no
         account_name
+        numstudent {
+          id
+          name
+          count
+        }
         paystack_secret_key
       }
     }

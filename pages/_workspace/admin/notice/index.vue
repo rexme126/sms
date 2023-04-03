@@ -349,10 +349,7 @@ export default {
               })
 
               data.notices.push(createNotice)
-              // console.log(dataCopy)
-
-              // Write our data back to the cache.
-              // Write back to the cache
+              
               store.writeQuery({
                 query: NOTICE_QUERIES,
                 variables: {

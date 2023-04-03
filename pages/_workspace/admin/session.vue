@@ -44,9 +44,46 @@
                     <b-icon icon="pencil" class="mr-1"> </b-icon>
                     Edit
                   </b-button>
+
+                    <b-button
+                variant="danger"
+                size="sm"
+                class="px-3"
+                @click="handleDeleteSession(data.item)"
+              >
+                <b-icon icon="trash" class="mr-1"> </b-icon>
+                Delete
+              </b-button>
                 </template>
               </b-table>
             </div>
+
+              <!-- delete modal -->
+        <b-modal id="DeleteModal" centered hide-header hide-footer>
+          <div class="p-5 text-center">
+            <Spinner v-if="isDeleting" size="4" />
+            <template v-else>
+              <h5>Confirm delete session?</h5>
+
+              <p>This action cannot be undone.</p>
+
+              <div>
+                <b-button
+                  variant="light"
+                  class="px-4 mr-2 border"
+                  @click="handleCancelDelete"
+                >
+                  Cancel
+                </b-button>
+
+                <b-button variant="danger" class="px-4" @click="deleteSession">
+                  Delete
+                </b-button>
+              </div>
+            </template>
+          </div>
+        </b-modal>
+        <!-- end -->
        
 
           <!-- Add Classes -->
@@ -118,6 +155,7 @@ import Swal from 'sweetalert2'
 import { SESSION_QUERIES, SESSION_QUERY } from '~/graphql/sessions/queries'
 import {
   CREATE_SESSION_MUTATION,
+  DELETE_SESSION_MUTATION,
   UPDATE_SESSION_MUTATION,
 } from '~/graphql/sessions/mutations'
 import Preload from '~/components/Preload.vue'
@@ -128,6 +166,8 @@ export default {
   data() {
     return {
       id: 0,
+      invokedForDelete: null,
+      isDeleting: false,
       sessionEditingId: '',
       session: {},
       busy: false,
@@ -253,7 +293,7 @@ export default {
               name: this.form.name,
               workspaceId: parseInt(this.mainWorkspace.id),
             },
-            update: (store, { data: { createSessionw } }) => {
+            update: (store, { data: { createSession } }) => {
               // Read the data from our cache for this query.
               const data = store.readQuery({
                 query: SESSION_QUERIES,
@@ -261,14 +301,9 @@ export default {
                   workspaceId: parseInt(this.mainWorkspace.id),
                 },
               })
-              // console.log(this.form.class);
 
-              data.sessions.push(createSessionw)
+              data.sessions.push(createSession)
 
-              // console.log(dataCopy)
-
-              // Write our data back to the cache.
-              // Write back to the cache
               store.writeQuery({
                 query: SESSION_QUERIES,
                 variables: {
@@ -305,6 +340,71 @@ export default {
           })
         }
       }
+    },
+     // -------- delete mutation -------------- //
+    handleCancelDelete() {
+      this.invokedForDelete = null
+
+      this.$bvModal.hide('DeleteModal')
+    },
+
+    handleDeleteSession(item) {
+      this.invokedForDelete = item
+
+      this.$bvModal.show('DeleteModal')
+    },
+
+     deleteSession() {
+      this.isDeleting = true
+      const deleteId = this.invokedForDelete.id
+      this.$apollo
+        .mutate({
+          mutation: DELETE_SESSION_MUTATION,
+          variables: {
+            id: parseInt(deleteId),
+          },
+          update: (store, { data: { deleteSession } }) => {
+            const data = store.readQuery({
+              query: SESSION_QUERIES,
+              variables: {
+                workspaceId: parseInt(this.mainWorkspace.id)
+              },
+            })
+
+             const index = data.sessions.findIndex((m) => m.id === deleteId)
+            if (index !== -1) {
+              // Mutate cache result
+              data.sessions.splice(index, 1)
+
+              store.writeQuery({
+                query: SESSION_QUERIES,
+                variables: {
+                 workspaceId: parseInt(this.mainWorkspace.id)
+                },
+                data,
+              })
+            }
+          },
+        })
+        .then(() => {
+          Swal.fire({
+            timer: 1000,
+            text: 'session deleted successfully',
+            position: 'top-right',
+            color: '#fff',
+            background: '#4bb543',
+            toast: false,
+            backdrop: false,
+            showConfirmButton: false,
+          })
+          this.isDeleting = false
+        })
+        .catch(() => {})
+        .finally(() => {
+          this.$bvModal.hide('DeleteModal')
+
+          this.isDeleting = false
+        })
     },
   },
 }

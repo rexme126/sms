@@ -1,27 +1,10 @@
 import gql from 'graphql-tag'
 
-import { KLASE_FIELDS_FRAGMENT } from './fragments'
-
-// export const KLASES_SUBJECT_QUERIES = gql`
-//   query myclassesQuery {
-//     klases {
-//       ...KlaseFields
-//     }
-//   }
-//   ${KLASE_FIELDS_FRAGMENT}
-// `
-
 export const KLASE_QUERIES = gql`
   query klasesQuery($workspaceId: Int) {
     klases(workspaceId: $workspaceId) {
       id
       name
-      teachers {
-        id
-        first_name
-        last_name
-        slug
-      }
     }
   }
 `
@@ -39,11 +22,6 @@ export const KLASES_QUERIES = gql`
     klases {
       id
       name
-      students {
-        id
-        first_name
-        last_name
-      }
     }
   }
 `

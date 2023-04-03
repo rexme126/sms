@@ -212,6 +212,29 @@
               </b-form-group>
             </b-col>
 
+            <b-col md="3" class="p-3">
+              <b-form-group label="Number of students">
+                <b-form-select
+                  v-model="form.numStudentId"
+                  :options="numStudents"
+                  value-field="id"
+                  text-field="name"
+                  class="mb-3"
+                  size="lg"
+                  required
+                >
+                  <!-- This slot appears above the options from 'options' prop -->
+                  <template #first>
+                    <b-form-select-option :value="null" disabled
+                      >-- Please student number --</b-form-select-option
+                    >
+                  </template>
+
+                  <!-- These options will appear after the ones from 'options' prop -->
+                </b-form-select>
+              </b-form-group>
+            </b-col>
+
             <b-col md="3" class="p-2">
               <b-form-group label="Country">
                 <b-form-select
@@ -332,7 +355,10 @@ import {
   STATE_QUERY,
 } from '~/graphql/users/queries'
 import { UPDATE_SCHOOL_MUTATION } from '~/graphql/workspace/mutations'
-import { SCHOOL_QUERY } from '~/graphql/workspace/queries'
+import {
+  SCHOOL_QUERY,
+  SCHOOL_STUDENT_NUMBER_QUERIES,
+} from '~/graphql/workspace/queries'
 import Preload from '~/components/Preload.vue'
 
 export default {
@@ -350,6 +376,7 @@ export default {
         email: '',
         last_name: '',
         first_name: '',
+        numStudentId: null,
         phone: null,
         country: null,
         state: null,
@@ -400,6 +427,9 @@ export default {
         return { id: this.form.state }
       },
     },
+    numStudents: {
+      query: SCHOOL_STUDENT_NUMBER_QUERIES,
+    },
     school: {
       query: SCHOOL_QUERY,
       variables() {
@@ -416,6 +446,7 @@ export default {
           this.form.slug = school.slug
           this.form.email = school.email
           this.form.gender = school.gender
+          this.form.numStudentId = school.numstudent.id
           this.image = school.photo
           this.form.last_name = school.user.last_name
           this.form.first_name = school.user.first_name
@@ -497,6 +528,7 @@ export default {
             phone: this.form.phone,
             last_name: this.form.last_name,
             first_name: this.form.first_name,
+            numStudentId: parseInt(this.form.numStudentId),
             country: parseInt(this.form.country),
             state: parseInt(this.form.state),
             city: this.form.city,
