@@ -1,12 +1,13 @@
 const inProduction = process.env.NODE_ENV === 'production'
 const host = inProduction ? '127.0.0.1' : `app.sms.test`
-const apiRoot = process.env.APP_API_ROOT || 'http://api.sms.test'
+const apiRoot = process.env.APP_API_ROOT
 
 export default {
   ssr: false,
   server: {
     host,
-    port: process.env.APP_PORT || 5000,
+    port: process.env.APP_PORT,
+    changeOrigin: true,
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -84,10 +85,10 @@ export default {
     },
   },
 
-  bootstrapVue: {
-    bootstrapCSS: false,
-    bootstrapVueCSS: false,
-  },
+  // bootstrapVue: {
+  //   bootstrapCSS: false,
+  //   bootstrapVueCSS: false,
+  // },
 
   styleResources: {
     scss: [
@@ -96,10 +97,10 @@ export default {
       '~/node_modules/bootstrap/scss/_mixins.scss',
     ],
   },
-  
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {},
+  axios: {
+  },
 
   // Auth configuration
   auth: {
@@ -129,6 +130,7 @@ export default {
      ** You can extend webpack config here
      */
     extend(config, ctx) {},
+    
   },
   publicRuntimeConfig: {
     APIRoot: apiRoot,

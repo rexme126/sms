@@ -203,6 +203,29 @@
           </b-col>
 
           <b-col md="3" class="p-3">
+            <b-form-group label="Number of students">
+              <b-form-select
+                v-model="form.numStudentId"
+                :options="numStudents"
+                value-field="id"
+                text-field="name"
+                class="mb-3"
+                size="lg"
+                required
+              >
+                <!-- This slot appears above the options from 'options' prop -->
+                <template #first>
+                  <b-form-select-option :value="null" disabled
+                    >-- Please student number --</b-form-select-option
+                  >
+                </template>
+
+                <!-- These options will appear after the ones from 'options' prop -->
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+
+          <b-col md="3" class="p-3">
             <b-form-group label="Country">
               <b-form-select
                 id="country"
@@ -317,6 +340,7 @@ import {
   STATE_QUERY,
 } from '~/graphql/users/queries'
 import { CREATE_SCHOOL_MUTATION } from '~/graphql/workspace/mutations'
+import { SCHOOL_STUDENT_NUMBER_QUERIES } from '~/graphql/workspace/queries'
 
 export default {
   middleware: 'auth',
@@ -330,6 +354,7 @@ export default {
         last_name: '',
         first_name: '',
         phone: null,
+        numStudentId: null,
         country: null,
         state: null,
         city: null,
@@ -357,6 +382,9 @@ export default {
       variables() {
         return { id: this.form.state }
       },
+    },
+    numStudents: {
+      query: SCHOOL_STUDENT_NUMBER_QUERIES,
     },
   },
 
@@ -433,6 +461,7 @@ export default {
               last_name: this.form.last_name,
               first_name: this.form.first_name,
               gender: this.form.gender,
+              numStudentId: parseInt(this.form.numStudentId),
               country: parseInt(this.form.country),
               state: parseInt(this.form.state),
               city: this.form.city,

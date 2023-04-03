@@ -163,6 +163,22 @@
             {{ data.index + 1 }}
           </template>
 
+          <template #cell(status)="data">
+            <span
+              v-if="data.item.status == 1"
+              style="color:green"
+            >
+              Active </span
+            >
+            <span v-else  style="color:red">
+              Suspended </span
+            >
+          </template>
+
+          <template #cell(numstudent)="data">
+            <span style="color: blue;font-weight:bold">{{ data.item.numstudent.name }}</span>
+          </template>
+
           <template #cell(photo)="data">
             <b-avatar
               variant="primary"
@@ -173,16 +189,6 @@
           <!-- view modal -->
           <template #cell(actions)="data">
             <b-button
-              variant="primary"
-              size="sm"
-              class="px-3"
-              @click="handleEditModal(data.item.id)"
-            >
-              <b-icon icon="pen" class="mr-1"></b-icon>
-              Edit
-            </b-button>
-
-            <b-button
               :to="{
                 name: 'workspace-school-id',
                 params: {
@@ -190,12 +196,22 @@
                   id: data.item.id,
                 },
               }"
-              variant="primary"
+              variant="secondary"
               size="sm"
               class="px-3"
             >
               <b-icon icon="eye" class="mr-1"></b-icon>
               View
+            </b-button>
+
+            <b-button
+              variant="primary"
+              size="sm"
+              class="px-3"
+              @click="handleEditModal(data.item.id)"
+            >
+              <b-icon icon="pen" class="mr-1"></b-icon>
+              Edit
             </b-button>
 
             <b-button
@@ -380,13 +396,16 @@ export default {
           key: 'gender',
           label: 'Gender',
           sortable: true,
-          // sortDirection: 'desc',
+        },
+        {
+          key: 'numstudent',
+          label: 'Number of students',
+          sortable: true,
         },
         {
           key: 'status',
           label: 'Status',
           sortable: true,
-          // sortDirection: 'desc',
         },
 
         { key: 'actions', label: 'Actions' },

@@ -6,6 +6,7 @@
         v-if="DuePaymentrecords"
         :PaidPaymentrecords="PaidPaymentrecords"
         :DuePaymentrecords="DuePaymentrecords"
+        :studentId="user.student.id"
       />
     </template>
   </div>

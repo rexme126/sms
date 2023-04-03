@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { ASSIGN_TEACHER_FRAGMENT, TEACHERS_FIELDS_FRAGMENT } from './fragments'
+import { TEACHERS_FIELDS_FRAGMENT } from './fragments'
 
 export const CREATE_TEACHER_MUTATION = gql`
   mutation CreateTeacherMutation(
@@ -38,5 +38,79 @@ export const UPDATE_TEACHER_MUTATION = gql`
 export const DELETE_TEACHER_MUTATION = gql`
   mutation DeleteTeacherMutation($id: Int!, $workspaceId: Int) {
     deleteTeacher(id: $id, workspaceId: $workspaceId)
+  }
+`
+export const CREATE_ASSIGN_SUBJECT_TO_TEACHER_MUTATION = gql`
+  mutation createSubjectToTeacherMutation(
+    $sectionId: Int!
+    $workspaceId: Int!
+    $klaseId: Int!
+    $subjectId: [String!]
+    $teacherId: Int!
+  ) {
+    createSubjectToTeacher(
+      sectionId: $sectionId
+      workspaceId: $workspaceId
+      klaseId: $klaseId
+      subjectId: $subjectId
+      teacherId: $teacherId
+    ) {
+      id
+      klase {
+        id
+        name
+      }
+      section {
+        id
+        name
+      }
+      subject {
+        id
+        subject
+      }
+      teacher {
+        id
+        first_name
+        last_name
+      }
+    }
+  }
+`
+
+export const UPDATE_ASSIGN_SUBJECT_TO_TEACHER_MUTATION = gql`
+  mutation updateSubjectToTeacherMutation(
+    $id: ID!
+    $subjectId: Int!
+    $teacherId: Int!
+  ) {
+    updateSubjectToTeacher(
+      id: $id
+      subjectId: $subjectId
+      teacherId: $teacherId
+    ) {
+      id
+      klase {
+        id
+        name
+      }
+      section {
+        id
+        name
+      }
+      subject {
+        id
+        subject
+      }
+      teacher {
+        id
+        first_name
+        last_name
+      }
+    }
+  }
+`
+export const DELETE_ASSIGN_SUBJECT_TO_TEACHER_MUTATION = gql`
+  mutation DeleteAssignToTeacherMutation($id: ID!) {
+    deleteSubjectToTeacher(id: $id)
   }
 `

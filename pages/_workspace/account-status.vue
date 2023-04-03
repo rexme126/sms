@@ -2,7 +2,7 @@
   <div style="background-color: #fff; width: 100%; height: 100vh">
     <SchoolTopnav />
     <div>
-      <h2 class="account-wrapper">This account is suspended</h2>
+      <h1 class="account-wrapper">This account is suspended</h1>
     </div>
   </div>
 </template>

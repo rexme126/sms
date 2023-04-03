@@ -1,12 +1,14 @@
 <template>
   <div class="top">
     <nav>
-      <b-icon
-        class="h1 toggle-menu"
-        variant="light"
-        icon="border-width"
+      <img
+        class="toggle-menu"
+        src="@/assets/svg/menu-bars-.svg"
+        alt="menu-bar"
+        width="40"
         @click="toggleThisMenu"
       />
+
       <ul class="d-flex align-items-center">
         <li>
           <span class="mainNotification">
@@ -67,7 +69,7 @@
         body-bg-variant="light"
         :hide-backdrop="false"
         scrollable
-        size="md"
+        size="lg"
         :hide-footer="true"
       >
         <Notification :notify-now="[$auth.user.id, notice]" />
@@ -81,7 +83,9 @@ import { mapState, mapActions } from 'pinia'
 import { useWorkspaceStore } from '@/stores/wokspace'
 import { useToggleMenu } from '@/stores/toggle'
 import { USER_NOTIFICATION_QUERIES } from '~/graphql/notifications/queries'
+import Notification from './Notification.vue'
 export default {
+  components: { Notification },
   data() {
     return {
       profileBody: false,
@@ -164,7 +168,9 @@ export default {
     }
 
     .bell {
-      margin-top: 10px;
+      margin-top: 17px;
+      height: 100%;
+      align-self: center;
       margin-right: 17px;
       cursor: pointer;
     }

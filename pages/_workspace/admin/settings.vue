@@ -171,7 +171,7 @@
                   <h5 class="p-3">Pay Through Bank</h5>
 
                   <div class="d-flex">
-                    <label class="p-2">Account_name:</label>
+                    <label class="p-2">Account Name:</label>
                     <b-form-input
                       id="account_name"
                       v-model="form.account_name"
@@ -184,7 +184,7 @@
                   </div>
 
                   <div class="d-flex">
-                    <label class="p-2">Account_no:</label>
+                    <label class="p-2 mr-4">Account No:</label>
                     <b-form-input
                       id="account_no"
                       v-model="form.account_no"
@@ -197,7 +197,7 @@
                   </div>
 
                   <div class="d-flex">
-                    <label class="p-2">Bank_name</label>
+                    <label class="p-2 mr-4">Bank Name</label>
                     <b-form-input
                       id="bank"
                       v-model="form.bank"
@@ -226,7 +226,9 @@
 
                   <!-- online payment -->
                   <div class="d-flex">
-                    <label class="p-2">Secret_key</label>
+                    <label class="p-2 mr-1" style="white-space: nowrap"
+                      >Secret key</label
+                    >
                     <b-form-input
                       id="paystack_secret_key"
                       v-model="form.paystack_secret_key"
@@ -254,7 +256,7 @@
                       @reset.prevent="onReset"
                     >
                       <div class="d-flex">
-                        <label class="p-2">Amount</label>
+                        <label class="p-2 mr-4">Amount</label>
                         <b-form-input
                           id="amount"
                           v-model="form.amount"
@@ -382,9 +384,12 @@ export default {
         this.preview_url_logo = e.target.result
       }
       reader.readAsDataURL(file)
-      this.form.logo = file
 
-      this.isValidFile(file)
+      if (this.isValidFile(file) === false) {
+        return
+      } else {
+        this.form.logo = file
+      }
     },
     // end of logo
     // stamp
@@ -408,12 +413,7 @@ export default {
     // end of stamp
 
     isValidFile(file) {
-      const imageFormats = [
-        'image/png',
-        'image/jpeg',
-        'image/jpg',
-        'image/svg+xml',
-      ]
+      const imageFormats = ['image/png', 'image/jpeg', 'image/jpg']
 
       const inValidType = !imageFormats.includes(file.type)
 
@@ -423,6 +423,7 @@ export default {
           title: 'Oops..',
           text: 'Please upload a valid image',
           timer: 1500,
+          showConfirmButton: false,
           color: '#716add',
           backdrop: '#7a7d7f',
         })
@@ -436,6 +437,7 @@ export default {
           title: 'Oops..',
           text: 'Image size must not exceed 5MB',
           color: '#716add',
+          showConfirmButton: false,
           backdrop: '#7a7d7f',
         })
 
@@ -471,7 +473,6 @@ export default {
                   status: 1,
                 },
               })
-              // console.log(this.form.class);
 
               data.adminWorkspace = updateAdminSettings
 

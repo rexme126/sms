@@ -543,7 +543,7 @@ export default {
       totalRows: 1,
       currentPage: 1,
       perPage: 5,
-      pageOptions: [10, 25, 50, { value: 100, text: 'Show a lot' }],
+      pageOptions: [50, { value: 200, text: 'Show a lot' }],
       sortBy: '',
       sortDesc: false,
       sortDirection: 'asc',

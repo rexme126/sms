@@ -1,8 +1,6 @@
 import gql from 'graphql-tag'
 
-import {
-  STUDENT_FIELDS_FRAGMENT,
-} from './fragments'
+import { STUDENT_FIELDS_FRAGMENT } from './fragments'
 
 export const STUDENT_QUERIES = gql`
   query StudentsQuery($workspaceId: Int) {
@@ -17,6 +15,17 @@ export const STUDENT_DASHBOARD_QUERIEX = gql`
   query StudentxDashdashboardQuery($workspaceId: Int) {
     studentsDashboard(workspaceId: $workspaceId) {
       id
+    }
+  }
+`
+// DASHBOARD
+export const ENCODED_IMAGE_QUERIES = gql`
+  query EncodedImagesquery($workspaceId: Int!, $studentId: Int) {
+    encodedImages(workspaceId: $workspaceId, studentId: $studentId) {
+      id
+      photoBase64
+      logoBase64
+      stampBase64
     }
   }
 `
@@ -82,6 +91,31 @@ export const USER_STUDENT_QUERY = gql`
           name
         }
         birthday
+      }
+    }
+  }
+`
+
+export const STUDENT_SUBJECT_ALLOCATION_QUERIES = gql`
+  query StudentSubjectAllocationQuery($klaseId: Int!, $workspaceId: Int!) {
+    studentSubjectAllocation(klaseId: $klaseId, workspaceId: $workspaceId) {
+      id
+      klase {
+        id
+        name
+      }
+      section {
+        id
+        name
+      }
+      subject {
+        id
+        subject
+      }
+      teacher {
+        id
+        first_name
+        last_name
       }
     }
   }

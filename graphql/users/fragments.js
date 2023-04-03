@@ -32,15 +32,7 @@ export const UXER_FIELDS_FRAGMENT = gql`
     state {
       id
       name
-      # cities {
-      #   id
-      #   name
-      # }
     }
-    # city {
-    #   id
-    #   name
-    # }
   }
 `
 
@@ -92,17 +84,11 @@ export const USERS_FIELDS_FRAGMENT = gql`
     country {
       id
       name
-      
     }
     state {
       id
       name
-
     }
-    # city {
-    #   id
-    #   name
-    # }
     workspace {
       id
       name

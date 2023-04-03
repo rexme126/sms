@@ -156,7 +156,15 @@
             >
               Student Result Section
             </h2>
-            <b-table :items="klaseResults" :fields="fields">
+            <div class="search-input-wrap mr-3 mb-3">
+              <b-form-input v-model="search" placeholder="Search..." />
+              <b-icon
+                style="color: #111"
+                class="h5 mt-3 search-icon"
+                icon="search"
+              />
+            </div>
+            <b-table :items="klaseResultx" :fields="fields">
               <template #cell(#)="data">
                 {{ data.index + 1 }}
               </template>
@@ -166,11 +174,11 @@
               </template>
 
               <template #cell(photo)="data">
-                 <b-avatar
-                    variant="primary"
-                    :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${data.item.student.photo}`"
-                  >
-                  </b-avatar>
+                <b-avatar
+                  variant="primary"
+                  :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${data.item.student.photo}`"
+                >
+                </b-avatar>
               </template>
 
               <template #cell(adm_no)="data">
@@ -191,7 +199,7 @@
 
               <template #cell(actions)="data">
                 <b-button
-                class="sm"
+                  class="sm"
                   variant="warning"
                   style="font-weight: bold"
                   :to="{
@@ -234,6 +242,7 @@ export default {
   middleware: 'auth',
   data() {
     return {
+      search: '',
       klaseResults: [],
       student: [],
       isBusy: false,
@@ -336,6 +345,15 @@ export default {
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
     }),
+    klaseResultx() {
+      return this.klaseResults.filter((t) => {
+        return (
+          t.student.first_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.student.last_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.student.adm_no.match(parseInt(this.search))
+        )
+      })
+    },
   },
   methods: {
     dynamicStudentClass(item) {
@@ -351,40 +369,62 @@ export default {
       ) {
         return false
       } else {
+        setTimeout(() => {
+          this.isBusy = true
+          this.student = [
+            this.form.class,
+            this.form.term,
+            this.form.session,
+            this.form.section,
+          ]
+          this.$apollo.addSmartQuery('klaseResults', {
+            query: EXAM_RECORD_QUERIES,
+            variables() {
+              return {
+                klase_id: parseInt(this.form.class),
+                term_id: parseInt(this.form.term),
+                session_id: parseInt(this.form.session),
+                section_id: parseInt(this.form.section),
+                workspaceId: parseInt(this.mainWorkspace.id),
+              }
+            },
+            result({ loading, data }, key) {
+              if (!loading) {
+                this.klaseResults = data.klaseResults
+
+                const numStudents = Object.keys(this.klaseResults).length
+                this.numStudents = numStudents
+                this.isBusy = false
+                this.timetableDropdownClass = true
+              }
+            },
+          })
+        }, 100)
       }
-
-      setTimeout(() => {
-        this.isBusy = true
-        this.student = [
-          this.form.class,
-          this.form.term,
-          this.form.session,
-          this.form.section,
-        ]
-        this.$apollo.addSmartQuery('klaseResults', {
-          query: EXAM_RECORD_QUERIES,
-          variables() {
-            return {
-              klase_id: parseInt(this.form.class),
-              term_id: parseInt(this.form.term),
-              session_id: parseInt(this.form.session),
-              section_id: parseInt(this.form.section),
-              workspaceId: parseInt(this.mainWorkspace.id),
-            }
-          },
-          result({ loading, data }, key) {
-            if (!loading) {
-              this.klaseResults = data.klaseResults
-
-              const numStudents = Object.keys(this.klaseResults).length
-              this.numStudents = numStudents
-              this.isBusy = false
-              this.timetableDropdownClass = true
-            }
-          },
-        })
-      }, 100)
     },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.search-input-wrap {
+  width: 270px;
+  position: relative;
+  display: flex;
+
+  & .search-icon {
+    position: absolute;
+    right: 11px;
+    top: -8px;
+  }
+
+  .form-control {
+    border-radius: 30px;
+    font-size: 0.85rem;
+    padding: 20px 30px;
+    height: 35px;
+    background-color: rgba(#d9ecff, 0.5);
+    // border-color: transparent;
+  }
+}
+</style>

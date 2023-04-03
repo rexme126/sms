@@ -6,7 +6,7 @@
         class="shadow-sm mb-3"
         variant="light"
         pill
-        size="md"
+        size="sm"
         @click="changePassword"
         >Change Password</b-button
       >
@@ -54,7 +54,7 @@
               {{ student.middle_name }}
             </p>
             <p>{{ student.gender }}</p>
-            <p>{{ student.klase.name }}</p>
+            <p>{{ student.klase != null ? student.klase.name : 'Graduate student' }}</p>
             <p>{{ student.adm_no }}</p>
             <p>{{ student.code }}</p>
 
@@ -70,7 +70,7 @@
               {{ user.state.name }}
             </p>
             <p>
-              {{ user.city.name }}
+              {{ user.city }}
             </p>
             <p>
               {{ user.lga }}
@@ -80,7 +80,7 @@
       </b-card>
 
       <!-- change password modal -->
-      <b-modal id="passwordModal" size="sm" centered hide-header hide-footer>
+      <b-modal id="passwordModal" size="md" centered hide-header hide-footer>
         <div class="p-5">
           <div class="form">
             <!-- description -->
@@ -97,7 +97,7 @@
                   placeholder="Enter old Password"
                   type="password"
                   required
-                  size="lg"
+                  size="md"
                 ></b-form-input>
 
                 <span style="color: red">{{ oldPassword }}</span>
@@ -109,7 +109,7 @@
                   placeholder="Enter Password"
                   type="password"
                   required
-                  size="lg"
+                  size="md"
                 ></b-form-input>
               </b-form-group>
 
@@ -120,7 +120,7 @@
                   placeholder="Comfirm password"
                   type="password"
                   required
-                  size="lg"
+                  size="md"
                   @input="changeColor"
                   :style="{ border: isGreen }"
                 ></b-form-input>
@@ -131,7 +131,7 @@
                 type="submit"
                 variant="primary"
                 class="mr-4"
-                size="lg"
+                size="md"
                 :disabled="form.busy"
               >
                 <b-spinner
@@ -154,6 +154,8 @@ import { mapState } from 'pinia'
 import { useWorkspaceStore } from '@/stores/wokspace'
 import { USER_STUDENT_QUERY } from '~/graphql/students/queries'
 import Preload from '~/components/Preload.vue'
+import { CHANGE_USER_PASSWORD_MUTATION } from '~/graphql/users/mutations'
+import Swal from 'sweetalert2'
 
 export default {
   components: { Preload },

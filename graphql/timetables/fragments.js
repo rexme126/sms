@@ -28,25 +28,25 @@ export const SINGLE_TIMETABLE_FIELDS_FRAGMENT = gql`
     time
   }
 `
-export const TEACHER_TIMETABLE_FIELDS_FRAGMENT = gql`
-  fragment TeacherTimetableFields on TeacherTimetable {
-    id
-    teacher {
-      id
-      first_name
-      last_name
-    }
-    subject {
-      id
-      subject
-    }
-    klase {
-      id
-      name
-    }
-    section {
-      id
-      name
-    }
-  }
-`
+// export const TEACHER_TIMETABLE_FIELDS_FRAGMENT = gql`
+//   fragment TeacherTimetableFields on TeacherTimetable {
+//     id
+//     teacher {
+//       id
+//       first_name
+//       last_name
+//     }
+//     subject {
+//       id
+//       subject
+//     }
+//     klase {
+//       id
+//       name
+//     }
+//     section {
+//       id
+//       name
+//     }
+//   }
+// `

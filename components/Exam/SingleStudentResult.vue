@@ -47,12 +47,13 @@
                   >
                     <div class="school-logo">
                       <div v-if="mainWorkspace.logo == null"></div>
-                      <img
-                        v-else
-                        :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/logo/${mainWorkspace.logo}`"
-                        alt="logo"
-                        width="50"
-                      />
+                      <div v-else-if="encodedImages">
+                        <img
+                          :src="`data:image/png;base64,${encodedImages.logoBase64}`"
+                          alt="logo"
+                          width="50"
+                        />
+                      </div>
                     </div>
                     <div class="d-flex flex-column align-items-center">
                       <h1 style="font-weight: bold; color: #1c0988">
@@ -64,12 +65,13 @@
                     </div>
                     <div class="student-picture">
                       <div v-if="first.student.photo == null"></div>
-                      <img
-                        v-else
-                        :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${first.student.photo}`"
-                        alt=""
-                        width="100"
-                      />
+                      <div v-else-if="encodedImages">
+                        <img
+                          :src="`data:image/png;base64,${encodedImages.photoBase64}`"
+                          alt="photo"
+                          width="100"
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -670,18 +672,14 @@
                         ></div>
 
                         <h6 class="p-4 text-center">
-                          <img
-                            v-if="mainWorkspace.stamp == null"
-                            src="@/assets/svg/ronazon-logo.svg"
-                            alt="logo"
-                            width="100"
-                          />
-                          <img
-                            v-else
-                            :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/stamp/${mainWorkspace.stamp}`"
-                            alt=""
-                            width="50"
-                          />
+                          <div v-if="mainWorkspace.stamp == null"></div>
+                          <div v-else-if="encodedImages">
+                            <img
+                              :src="`data:image/png;base64,${encodedImages.stampBase64}`"
+                              alt="stamp"
+                              width="50"
+                            />
+                          </div>
                         </h6>
                       </div>
                     </div>
@@ -703,7 +701,7 @@
       </template>
 
       <template v-else>
-        <h6 class="text-center p-5">No Record Found</h6>
+        <h3 class="text-center p-5">No Record Found</h3>
       </template>
     </b-card>
   </div>
@@ -714,6 +712,7 @@ import { mapState } from 'pinia'
 import { useWorkspaceStore } from '@/stores/wokspace'
 import { SET_PROMOTION_QUERIES } from '~/graphql/promotions/queries'
 import { GRADE_QUERIES } from '~/graphql/grades/queries'
+import { ENCODED_IMAGE_QUERIES } from '~/graphql/students/queries'
 export default {
   props: {
     studentExamResult: Array,
@@ -732,6 +731,16 @@ export default {
     },
   },
   apollo: {
+    encodedImages: {
+      query: ENCODED_IMAGE_QUERIES,
+      variables() {
+        return {
+          studentId: parseInt(this.studentExamResult[0].student.id),
+          workspaceId: parseInt(this.mainWorkspace.id),
+        }
+      },
+    },
+
     setPromotion: {
       query: SET_PROMOTION_QUERIES,
       variables() {

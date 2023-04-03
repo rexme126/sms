@@ -6,12 +6,6 @@ export const SUBJECT_QUERIES = gql`
   query subjectsQuery($klase_id: Int!, $workspaceId: Int, $section_id: Int!) {
     subjects(klase_id: $klase_id, workspaceId: $workspaceId, section_id: $section_id) {
       ...SingleSubjectsFields
-      teachers {
-        id
-        first_name
-        last_name
-        slug
-      }
     }
   }
   ${SINGLE_SUBJECTS_FIELDS_FRAGMENT}
@@ -29,6 +23,7 @@ export const SUBJECTS_QUERIES = gql`
     subjects(workspaceId: $workspaceId) {
       id
       subject
+      subject_code
     }
   }
 `

@@ -106,11 +106,9 @@ export default {
   methods: {
     handleOnComplete(value) {
       this.form.otp = value
-      // console.log('OTP completed: ', value)
     },
     handleOnChange(value) {
       this.onChange = value
-      console.log('OTP changed: ', value)
     },
     // handleClearInput() {
     //   this.$refs.otpInput.clearInput()

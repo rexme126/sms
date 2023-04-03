@@ -1,5 +1,6 @@
 import gql from 'graphql-tag'
 import { UXER_FIELDS_FRAGMENT } from '../users/fragments'
+import { SCHOOL_STUDENT_NUMBER_FRAGMENT, WORKSPACE_FRAGMENT } from './fragments'
 
 export const CREATE_SCHOOL_MUTATION = gql`
   mutation CreateSchoolMutation(
@@ -8,6 +9,7 @@ export const CREATE_SCHOOL_MUTATION = gql`
     $email: String!
     $phone: String!
     $gender: String!
+    $numStudentId: Int!
     $first_name: String!
     $last_name: String!
     $lga: String
@@ -21,6 +23,7 @@ export const CREATE_SCHOOL_MUTATION = gql`
       slug: $slug
       email: $email
       gender: $gender
+      numStudentId: $numStudentId
       phone: $phone
       first_name: $first_name
       last_name: $last_name
@@ -40,6 +43,7 @@ export const UPDATE_SCHOOL_MUTATION = gql`
     $email: String!
     $phone: String!
     $gender: String!
+    $numStudentId: Int!
     $first_name: String!
     $last_name: String!
     $lga: String
@@ -55,6 +59,7 @@ export const UPDATE_SCHOOL_MUTATION = gql`
       email: $email
       phone: $phone
       gender: $gender
+      numStudentId: $numStudentId
       first_name: $first_name
       last_name: $last_name
       lga: $lga
@@ -70,12 +75,16 @@ export const UPDATE_SCHOOL_MUTATION = gql`
       status
       photo
       gender
+      numstudent {
+        ...StudentNumber
+      }
       user {
         ...UxerFields
       }
     }
   }
   ${UXER_FIELDS_FRAGMENT}
+  ${SCHOOL_STUDENT_NUMBER_FRAGMENT}
 `
 
 export const DELETE_SCHOOL_MUTATION = gql`
@@ -102,25 +111,16 @@ export const UPDATE_SETTING_ADMIN_MUTATION = gql`
       account_no: $account_no
       paystack_secret_key: $paystack_secret_key
     ) {
-      id
-      logo
-      stamp
-      bank
-      account_name
-      account_no
-      paystack_secret_key
+      ...WorkspaceFields
     }
   }
+  ${WORKSPACE_FRAGMENT}
 `
 export const SUSPEND_SCHOOL_MUTATION = gql`
   mutation SuspendSchoolMutation($workspaceId: ID!, $status: Int!) {
     SuspendSchool(workspaceId: $workspaceId, status: $status) {
-      id
-      logo
-      stamp
-      email
-      status
-      paystack_secret_key
+      ...WorkspaceFields
     }
   }
+  ${WORKSPACE_FRAGMENT}
 `

@@ -825,10 +825,10 @@ export default {
               backdrop: false,
               showConfirmButton: false,
             })
-            // this.$router.push({
-            //   name: 'workspace-admin-student',
-            //   params: { workspace: this.mainWorkspace.slug },
-            // })
+            this.$router.push({
+              name: 'workspace-admin-student',
+              params: { workspace: this.mainWorkspace.slug },
+            })
           })
 
         this.form.busy = false

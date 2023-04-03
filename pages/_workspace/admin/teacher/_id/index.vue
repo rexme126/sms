@@ -25,7 +25,8 @@
         </div>
 
         <div v-else class="text-center mb-4 mt-4">
-          <b-img style="border-radius:50%"
+          <b-img
+            style="border-radius: 50%"
             :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/teachers/${teacher.photo}`"
             thumbnail
             fluid
@@ -48,14 +49,8 @@
             <p>State</p>
             <p>City</p>
             <p>L.G.A</p>
-
-            <h5>
-              <b-badge variant="primary">Subjects Assigned</b-badge>
-            </h5>
-            <h5>
-              <b-badge variant="warning">Class Assigned</b-badge>
-            </h5>
           </div>
+
           <div style="font-weight: bold">
             <p>
               {{ teacher.last_name }} {{ teacher.first_name }}
@@ -87,43 +82,6 @@
             <p>
               {{ teacher.user.lga }}
             </p>
-            <h5 v-for="subject in teacher.subjects" :key="subject.id">
-              <p>
-                <b-badge
-                  style="line-height: 1.2"
-                  variant="primary"
-                  class="px-2"
-                  >{{ subject.subject }}</b-badge
-                >
-              </p>
-              <!-- <b-popover :target="klase.id" triggers="hover click">
-                <b-nav vertical>
-                  <b-nav-item
-                    v-for="subject in klase.subjects"
-                    :key="subject.id"
-                  >
-                    <div style="font-size: 1.4px">{{ subject.subject }}</div>
-                  </b-nav-item>
-                </b-nav>
-              </b-popover> -->
-            </h5>
-
-            <h5 v-for="klase in teacher.klases" :key="klase.id">
-              <b-badge :id="klase.id" variant="warning" class="px-2">{{
-                klase.name
-              }}</b-badge>
-
-              <!-- <b-popover :target="klase.id" triggers="hover click">
-                <b-nav vertical>
-                  <b-nav-item
-                    v-for="subject in klase.subjects"
-                    :key="subject.id"
-                  >
-                    <div style="font-size: 1.4px">{{ subject.subject }}</div>
-                  </b-nav-item>
-                </b-nav>
-              </b-popover> -->
-            </h5>
           </div>
         </div>
       </b-card>

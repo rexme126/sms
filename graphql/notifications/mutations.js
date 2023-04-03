@@ -7,3 +7,9 @@ export const MARK_AS_READ = gql`
     }
   }
 `
+
+export const MARK_ONE_AS_READ = gql`
+  mutation ($id: ID) {
+    markOneAsRead(id: $id)
+  }
+`

@@ -20,21 +20,28 @@
           Total number of days
           <span style="color: red">{{ classAttendances[0].num_total }} </span>
         </h4>
-
-        <b-row>
-          <b-col md="2">
+        <div class="d-flex">
+          <div>
             <b-form-group label="Total Days">
               <input
                 v-model="form.num_total"
                 type="number"
                 class="mb-2"
-               style="width: 70px; padding-left: 5px; height:35px"
+                style="width: 70px; padding-left: 5px; height: 35px"
                 required
-              >
-             
+              />
             </b-form-group>
-          </b-col>
-        </b-row>
+          </div>
+
+          <div class="search-input-wrap mr-3 ml-auto">
+            <b-form-input v-model="search" placeholder="Search..." />
+            <b-icon
+              style="color: #111"
+              class="h5 mt-3 search-icon"
+              icon="search"
+            />
+          </div>
+        </div>
 
         <div style="width: 80%; margin: auto">
           <table class="table table-striped table-sm align-table">
@@ -49,13 +56,12 @@
 
             <tbody>
               <tr
-                v-for="(classAttendance, value) in classAttendances"
+                v-for="(classAttendance, value) in classAttendancex"
                 :key="classAttendance.id"
               >
                 <td>{{ value + 1 }}</td>
 
                 <td>
-                  
                   {{ classAttendance.student.last_name }}
                   {{ classAttendance.student.first_name }}
                 </td>
@@ -82,7 +88,7 @@
                         'num_present'
                       )
                     "
-                    style="width: 70px; padding-left: 5px; height:35px"
+                    style="width: 70px; padding-left: 5px; height: 35px"
                   />
                 </td>
               </tr>
@@ -119,6 +125,7 @@ export default {
     return {
       mainAttendances: [],
       busy: false,
+      search: '',
       form: new this.$form({
         num_total: null,
       }),
@@ -128,6 +135,14 @@ export default {
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
     }),
+    classAttendancex() {
+      return this.classAttendances.filter((t) => {
+        return (
+          t.student.first_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.student.last_name.toLowerCase().match(this.search.toLowerCase())
+        )
+      })
+    },
   },
   methods: {
     sendAttendance(classAttendance, value, keyName) {
@@ -190,3 +205,26 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.search-input-wrap {
+  width: 270px;
+  position: relative;
+  display: flex;
+
+  & .search-icon {
+    position: absolute;
+    right: 11px;
+    top: -8px;
+  }
+
+  .form-control {
+    border-radius: 30px;
+    font-size: 0.85rem;
+    padding: 18px 30px;
+    height: 35px;
+    background-color: rgba(#d9ecff, 0.5);
+    // border-color: transparent;
+  }
+}
+</style>

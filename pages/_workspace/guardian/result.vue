@@ -89,7 +89,7 @@
                     <b-form-select-option
                       v-for="student in user.guardian.students"
                       :key="student.id"
-                      :value="student.id"
+                      :value="[student.id, student.section.id]"
                       >{{ student.last_name }} {{ student.first_name }}
                     </b-form-select-option>
 
@@ -175,7 +175,7 @@ export default {
         session: null,
         section: null,
         term: null,
-        student_id: null,
+        student_id: [],
       },
 
       dynamicClass: '',
@@ -247,9 +247,10 @@ export default {
           variables() {
             return {
               klase_id: parseInt(this.form.class),
-              student_id: parseInt(this.form.student_id),
+              student_id: parseInt(this.form.student_id[0]),
               term_id: parseInt(this.form.term),
               session_id: parseInt(this.form.session),
+              section_id: parseInt(this.form.student_id[1]),
               status: 'published',
               workspaceId: parseInt(this.mainWorkspace.id),
             }
@@ -267,8 +268,9 @@ export default {
           variables() {
             return {
               klase_id: parseInt(this.form.class),
-              student_id: parseInt(this.form.student_id),
+              student_id: parseInt(this.form.student_id[0]),
               term_id: parseInt(this.form.term),
+              section_id: parseInt(this.form.student_id[1]),
               session_id: parseInt(this.form.session),
               status: 'published',
               workspaceId: parseInt(this.mainWorkspace.id),
@@ -297,7 +299,6 @@ export default {
               this.klaseResults = data.klaseResults
 
               const numStudents = Object.keys(this.klaseResults).length
-              console.log(numStudents)
               this.numStudents = numStudents
               this.isBusy = false
               this.timetableDropdownClass = true

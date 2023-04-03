@@ -117,11 +117,14 @@ export const STUDENT_PAYMENT_RECORD_QUERY = gql`
 export const ALL_DUE_PAYMENT_QUERY = gql`
   query AllDuePaymentRecordsQuery(
     $workspaceId: Int
-    $search: String
     $first: Int!
     $page: Int!
   ) {
-    allDuePaymentRecords(workspaceId: $workspaceId, search: $search, first: $first, page: $page) {
+    allDuePaymentRecords(
+      workspaceId: $workspaceId
+      first: $first
+      page: $page
+    ) {
       data {
         ...PaymentRecordFields
       }

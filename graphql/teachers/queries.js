@@ -1,9 +1,9 @@
 import gql from 'graphql-tag'
-import { KLASE_FIELDS_FRAGMENT } from '../klases/fragments'
 
 import {
   TEACHERS_FIELDS_FRAGMENT,
 } from './fragments'
+
 // dashboard
 export const TEACHER_DASHBOARD_QUERIES = gql`
   query TeachersDashboardQueries($workspaceId: Int) {
@@ -12,28 +12,16 @@ export const TEACHER_DASHBOARD_QUERIES = gql`
     }
   }
 `
-// used by subject
-// export const TEACHER_QUERIES = gql`
-//   query TeachersQueries {
-//     teachers {
-//       ...TeacherFields
-//     }
-//   }
-//   ${TEACHER_FIELDS_FRAGMENT}
-// `
 
 export const TEACHER_QUERY = gql`
   query TeacherQuery($id: Int!, $workspaceId: Int) {
     teacher(id: $id, workspaceId: $workspaceId) {
       ...TeachersFields
-      subjects{
-        id
-        subject
-      }
     }
   }
   ${TEACHERS_FIELDS_FRAGMENT}
 `
+
 // used by all
 export const TEACHERS_QUERIES = gql`
   query TeachersQuery($workspaceId: Int) {
@@ -74,15 +62,72 @@ export const USER_TEACHER_QUERY = gql`
         birthday
         qualification
         employment
-        subjects {
-          id
-          subject
-        }
-        klases {
-          ...KlaseFields
-        }
       }
     }
   }
-  ${KLASE_FIELDS_FRAGMENT}
+`
+
+// assign subject to teacher
+
+export const ASSIGN_SUBJECT_TO_TEACHER_QUERIES = gql`
+  query assignSubjectToTeacherQuery(
+    $sectionId: Int!
+    $workspaceId: Int!
+    $klaseId: Int!
+  ) {
+    assignSubjectToTeachers(
+      sectionId: $sectionId
+      workspaceId: $workspaceId
+      klaseId: $klaseId
+    ) {
+      id
+      klase {
+        id
+        name
+      }
+      section{
+        id
+        name
+      }
+      subject {
+        id
+        subject
+      }
+      teacher {
+        id
+        first_name
+        last_name
+      }
+    }
+  }
+`
+export const TEACHER_SUBJECT_ALLOCATION_QUERIES = gql`
+  query TeacherSubjectAllocationQuery(
+    $teacherId: Int!
+    $workspaceId: Int!
+  ) {
+    teacherSubjectAllocation(
+      teacherId: $teacherId
+      workspaceId: $workspaceId
+    ) {
+      id
+      klase {
+        id
+        name
+      }
+      section{
+        id
+        name
+      }
+      subject {
+        id
+        subject
+      }
+      teacher {
+        id
+        first_name
+        last_name
+      }
+    }
+  }
 `

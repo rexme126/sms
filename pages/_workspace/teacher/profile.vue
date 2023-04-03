@@ -46,13 +46,6 @@
             <p>State</p>
             <p>city</p>
             <p>L.G.A</p>
-
-            <h6>
-              <b-badge variant="primary">Class Assigned</b-badge>
-            </h6>
-            <h6>
-              <b-badge variant="warning">Subjects Assigned</b-badge>
-            </h6>
           </div>
 
           <div style="font-weight: bold">
@@ -81,40 +74,6 @@
             <p>
               {{ user.lga }}
             </p>
-
-            <h6 v-for="klase in teacher.klases" :key="klase.id">
-              <p>
-                <b-badge
-                  :id="klase.id"
-                  style="line-height: 1.6"
-                  variant="primary"
-                  class="px-2"
-                  >{{ klase.name }}</b-badge
-                >
-              </p>
-              <!-- <b-popover :target="klase.id" triggers="hover click">
-                <b-nav vertical>
-                  <b-nav-item
-                    v-for="subject in klase.subjects"
-                    :key="subject.id"
-                  >
-                    <div>{{ subject.subject }}</div>
-                  </b-nav-item>
-                </b-nav>
-              </b-popover> -->
-            </h6>
-
-            <h6 v-for="subject in teacher.subjects" :key="subject.id">
-              <p>
-                <b-badge
-                  :id="subject.id"
-                  style="line-height: 1.6"
-                  variant="warning"
-                  class="px-2"
-                  >{{ subject.subject }}</b-badge
-                >
-              </p>
-            </h6>
           </div>
         </div>
       </b-card>
@@ -194,6 +153,8 @@ import { mapState } from 'pinia'
 import { useWorkspaceStore } from '@/stores/wokspace'
 import { USER_TEACHER_QUERY } from '@/graphql/teachers/queries'
 import Preload from '~/components/Preload.vue'
+import { CHANGE_USER_PASSWORD_MUTATION } from '~/graphql/users/mutations'
+import Swal from 'sweetalert2'
 
 export default {
   components: { Preload },

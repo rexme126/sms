@@ -8,26 +8,32 @@
         <div
           v-if="examRecords[0].ps == 'graduated'"
           class="w-100 py-2 text-center align-middle"
-          style="background-color: green; color:#fff"
+          style="background-color: green; color: #fff"
         >
           Result Published
         </div>
-        
 
         <div
           v-else
           class="w-100 py-2 text-center align-middle"
-          style="background-color: #d9530f; color:#fff"
+          style="background-color: #d9530f; color: #fff"
         >
           Result Unpublished
         </div>
 
-
-        <h2 class="p-4 text-center" style="font-weight: bold">
+        <h3 class="p-4 text-center" style="font-weight: bold">
           <span style="color: green">({{ examRecords[0].klase.name }})</span>
           Student Result Section
-        </h2>
-        <b-table :items="examRecords" :responsive="true" :fields="fields">
+        </h3>
+        <div class="search-input-wrap mr-3 mb-3">
+          <b-form-input v-model="search" placeholder="Search..." />
+          <b-icon
+            style="color: #111"
+            class="h5 mt-3 search-icon"
+            icon="search"
+          />
+        </div>
+        <b-table :items="examRecordx" :responsive="true" :fields="fields">
           <template #cell(#)="data">
             {{ data.index + 1 }}
           </template>
@@ -36,13 +42,13 @@
             {{ data.item.student.last_name }} {{ data.item.student.first_name }}
           </template>
 
-           <template #cell(photo)="data">
-                 <b-avatar
-                    variant="primary"
-                    :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${data.item.student.photo}`"
-                  >
-                  </b-avatar>
-              </template>
+          <template #cell(photo)="data">
+            <b-avatar
+              variant="primary"
+              :src="`${$config.APIRoot}/storage/${mainWorkspace.id}/students/${data.item.student.photo}`"
+            >
+            </b-avatar>
+          </template>
 
           <template #cell(adm_no)="data">
             {{ data.item.student.adm_no }}
@@ -62,7 +68,7 @@
             v-if="examRecords[0].ps == 'graduated'"
             :disabled="busy"
             variant="danger"
-            size="lg"
+            size="md"
             @click="graduateStudents('notGraduated')"
           >
             <b-spinner
@@ -77,7 +83,7 @@
             v-else
             :disabled="busy"
             variant="success"
-            size="lg"
+            size="md"
             @click="graduateStudents('graduated')"
           >
             <b-spinner v-if="busy" variant="light" small class="mr-1 mb-1" />
@@ -97,14 +103,24 @@ import { EXAM_RECORD_QUERIES } from '~/graphql/examRecord/queries'
 import { CREATE_GRADUATE_MUTATION } from '~/graphql/examRecord/mutations'
 export default {
   props: {
-    examRecords: Array,
-    student: Array,
-    setPromotion: Object,
+    examRecords: {
+      type: Array,
+      required: false,
+    },
+    student: {
+      type: Array,
+      required: false,
+    },
+    setPromotion: {
+      type: Object,
+      required: false,
+    },
   },
   data() {
     return {
       busy: false,
       set: null,
+      search: '',
       graduateId: null,
       fields: [
         {
@@ -120,7 +136,7 @@ export default {
           key: 'adm_no',
           label: 'Adm_no.',
         },
-         {
+        {
           key: 'photo',
           label: 'Photo.',
         },
@@ -148,6 +164,15 @@ export default {
     ...mapState(useWorkspaceStore, {
       mainWorkspace: (store) => store.currentWorkspace,
     }),
+    examRecordx() {
+      return this.examRecords.filter((t) => {
+        return (
+          t.student.first_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.student.last_name.toLowerCase().match(this.search.toLowerCase()) ||
+          t.student.adm_no.match(parseInt(this.search))
+        )
+      })
+    },
   },
 
   methods: {
@@ -211,3 +236,26 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.search-input-wrap {
+  width: 270px;
+  position: relative;
+  display: flex;
+
+  & .search-icon {
+    position: absolute;
+    right: 11px;
+    top: -8px;
+  }
+
+  .form-control {
+    border-radius: 30px;
+    font-size: 0.85rem;
+    padding: 20px 30px;
+    height: 35px;
+    background-color: rgba(#d9ecff, 0.5);
+    // border-color: transparent;
+  }
+}
+</style>
